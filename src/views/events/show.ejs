@@ -90,10 +90,9 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text">日付</span>
                             </div>
-                                <div><%= data.holdDateYear %>年<%= data.holdDateMonth %>月<%= data.holdDateDate %>日</div>
-                                <br>
-                                <div><%= data.holdDateTime %>〜</div>
-                        </div>
+                            <div><%= data.holdDate.Year %>年<%= data.holdDate.Month %>月<%= data.holdDate.Date %>日</div>
+                            <div><%= data.holdDate.Time %>〜</div>
+                    </div>
                         <div class="col-10  input-group">
                             <div class="input-group-prepend">
                                 <span class="input-group-text">参加状況</span>
