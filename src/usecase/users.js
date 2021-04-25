@@ -21,4 +21,52 @@ module.exports = {
         })
         return oneUser
     },
+    findForPayload: async function (res, params) {
+        const oneUser = await db.User.findOne({
+            where: {
+                email: params.email,
+                password: params.password,
+            }
+        }).catch(err => {
+            res.render('layout', { layout_name: 'error', title: 'ERROR', msg: err });
+        });
+        return oneUser
+    },
+    userGetAll: async function () {
+        const allUsers = await db.User.findAll()
+        .catch(err => {
+            res.render('layout', { layout_name: 'error', title: 'ERROR', msg: err });
+        });
+        return allUsers;
+    },
+    userCreate: async function (res, params) {
+        const newUser = await db.User.create({
+            name: params.name,
+            password: params.password,
+            email: params.email,
+        }).catch(err => {
+            res.render('layout', { layout_name: 'error', title: 'ERROR', msg: err });
+        });
+        return newUser;
+    },
+    userDelete: async function (res, userId){
+        await db.User.destroy({
+            where: { id: userId }
+        }).catch(err => {
+            res.render('layout', { layout_name: 'error', title: 'ERROR', msg: err });
+        });
+        return true;
+    },
+    userImageUpload: async function (res, params) {
+        const newUser = await db.User.update({
+            image: params.id + params.name + ".jpg",
+        }, {
+            where: { id: params.id, }
+        }).catch(err => {
+            res.render('layout', { layout_name: 'error', title: 'ERROR', msg: err });
+        });
+        return newUser;
+    }
+
+
 }

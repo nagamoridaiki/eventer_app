@@ -95,7 +95,6 @@ module.exports = {
     edit: async(req, res, next) => {
         const EventId = req.params.id;
         const oneEvent = await eventUseCase.findOneEvent(EventId);
-
         const holdDate = await eventUseCase.getHoldDate(oneEvent);
 
         const data = {
