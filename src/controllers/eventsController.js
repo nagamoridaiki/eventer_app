@@ -13,6 +13,7 @@ const moment = require('moment')
 const eventUseCase = require('../usecase/events')
 const tagUseCase = require('../usecase/tags')
 const userUseCase = require('../usecase/users')
+const joinUseCase = require('../usecase/joins')
 
 module.exports = {
     index: async(req, res, next) => {
@@ -132,9 +133,9 @@ module.exports = {
     show: async(req, res, next) => {
         const EventId = req.params.id;
         const oneEvent = await eventUseCase.findOneEvent(EventId);
-
         let isJoin = false;
         const joinUser = oneEvent.User;
+
         //あなたはそのイベントに参加予定か？
         joinUser.forEach(element => {
             if (element.id == req.session.user.id) {
@@ -143,7 +144,6 @@ module.exports = {
         });
         //イベントの投稿者
         const writter = await userUseCase.findOneUser(oneEvent.userId);
-
         //開催日時情報
         const holdDate = await eventUseCase.getHoldDate(oneEvent);
 
@@ -157,57 +157,21 @@ module.exports = {
             holdDate: holdDate,
         }
         res.render('layout', { layout_name: 'events/show', data });
-
-
     },
     delete: async(req, res, next) => {
-
         const deletedEventId = await eventUseCase.eventDelete(req.params.id);
-
         //イベントタグ情報を消す
         await tagUseCase.eventTagDestroy(deletedEventId);
-
         //参加状況を消す
-        await db.Join.destroy({
-            where: { eventId: deletedEventId }
-        }).catch((err) => {
-            res.render('layout', { layout_name: 'error', title: 'ERROR', msg: err });
-        });
-
+        await joinUseCase.destroy(deletedEventId);
         res.redirect('/events');
-
     },
     join: async(req, res, next) => {
-        //いいねがついているかを判定する。
-        const form = {
-            userId: req.body.userId,
-            eventId: req.body.eventId,
-        };
-        const join = await db.Join.findOne({
-            where: form
-        })
-        if (join) {
-            //既にいいねがついている場合、いいねを外す。
-            await db.Join.destroy({
-                    where: form
-                })
-                .then(() => {
-                    res.redirect('/events');
-                })
-                .catch((err) => {
-                    res.render('layout', { layout_name: 'error', title: 'ERROR', msg: err });
-                });
-        } else {
-            //いいねがついていない場合、いいねをつける。
-            await db.Join.create(form)
-                .then(() => {
-                    res.redirect('/events');
-                })
-                .catch((err) => {
-                    res.render('layout', { layout_name: 'error', title: 'ERROR', msg: err });
-                });
-        }
+        //参加しているかを判定する。
+        const joinData = await joinUseCase.findOne(req.body);
+        //参加表明と参加辞退を切り替える
+        joinData ? await joinUseCase.exit(res, req.body) : await joinUseCase.entry(res, req.body)
+
+        res.redirect('/events');
     }
-
-
 }
