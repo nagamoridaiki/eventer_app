@@ -29,7 +29,7 @@ module.exports = {
                     content: event,
                     Tags: Tags,
                 }
-                res.render('layout', { layout_name: 'events/list', data });
+                res.render('layout', { layout_name: 'events/list2', data });
             });
     },
     search: async(req, res, next) => {

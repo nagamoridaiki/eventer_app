@@ -19,7 +19,7 @@ router.get('/login', usersController.login);
 router.get('/register', usersController.register);
 router.post('/create', usersController.create, usersController.indexView);
 
-router.post('/login', usersController.apiAuthenticate, usersController.index, usersController.indexView);
+router.post('/login', usersController.apiAuthenticate, usersController.index);
 router.post('/delete/', usersController.verifyJWT, usersController.delete, usersController.indexView);
 
 

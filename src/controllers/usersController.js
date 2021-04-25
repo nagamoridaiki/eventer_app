@@ -20,16 +20,31 @@ const upload = multer({ storage: storage })
 
 module.exports = {
     login: async(req, res, next) => {
-        res.render('layout', { layout_name: 'login', title: 'login' });
+        const data = {
+            title: 'login',
+            login: {
+                image: null
+            },
+
+        }
+        res.render('layout', { layout_name: 'login', title: 'login', data });
     },
     register: async(req, res, next) => {
-        res.render('layout', { layout_name: 'Register', title: 'Register' });
+        const data = {
+            title: 'Register',
+            login: req.session.user,
+        }
+        res.render('layout', { layout_name: 'Register', title: 'Register', data });
     },
     index: (req, res, next) => {
         db.User.findAll()
             .then(users => {
                 res.locals.users = users;
-                next();
+                const data = {
+                title: 'login',
+                login: req.session.user,
+            }
+            res.render('layout', { layout_name: 'index', title: 'login', data });
             })
             .catch(error => {
                 res.render('layout', { layout_name: 'error', title: 'ERROR', msg: 'ユーザー情報取得に失敗しました。' });
