@@ -6,6 +6,7 @@ const db = require('../models/index')
 const httpStatus = require('http-status');
 const process = require('../config/process.js');
 const multer = require('multer')
+const userUseCase = require('../usecase/users')
 
 const storage = multer.diskStorage({
     destination: function(req, file, cb) {
@@ -25,79 +26,45 @@ module.exports = {
     register: async(req, res, next) => {
         res.render('layout', { layout_name: 'Register', title: 'Register' });
     },
-    index: (req, res, next) => {
-        db.User.findAll()
-            .then(users => {
-                res.locals.users = users;
-                next();
-            })
-            .catch(error => {
-                res.render('layout', { layout_name: 'error', title: 'ERROR', msg: 'ユーザー情報取得に失敗しました。' });
-                res.sendStatus(500)
-            });
+    index: async(req, res, next) => {
+        const users = await userUseCase.userGetAll();
+        res.locals.users = users;
+        next();
     },
     indexView: (req, res) => {
         res.render("layout", { layout_name: 'index', title: 'Index' });
     },
-    create: (req, res, next) => {
-        const form = {
-            name: req.body.name,
-            password: req.body.password,
-            email: req.body.email,
-        };
-        db.sequelize.sync()
-            .then(() => db.User.create(form)
-                .then(usr => {
-                    const payload = {
-                        id: usr.id,
-                        email: usr.email,
-                        password: usr.password
-                    }
-                    console.log("payload", payload) //{ id: 1, name: 'Taro', password: 'yamada' }
-                    const token = jsonWebToken.sign(payload, 'secret');
-                    req.session.token = token;
-                    res.redirect('/')
-                })
-                .catch(error => {
-                    res.render('layout', { layout_name: 'error', title: 'ERROR', msg: 'ユーザー作成に失敗しました。' });
-                    res.sendStatus(500)
-                })
-            )
+    create: async(req, res, next) => {
+        const newUser = await userUseCase.userCreate(res, req.body);
+        const payload = {
+            id: newUser.id,
+            email: newUser.email,
+            password: newUser.password
+        }
+        console.log("payload", payload) //{ id: 1, name: 'Taro', password: 'yamada' }
+        const token = jsonWebToken.sign(payload, 'secret');
+        req.session.token = token;
+        res.redirect('/')
     },
-    delete: (req, res, next) => {
-        db.sequelize.sync()
-            .then(() => db.User.destroy({
-                where: { id: req.body.id }
-            }))
-            .then(usr => {
-                res.redirect('/');
-            }).catch(error => {
-                res.render('layout', { layout_name: 'error', title: 'ERROR', msg: 'ユーザー削除に失敗しました。' });
-                res.sendStatus(500)
-            });
+    delete: async(req, res, next) => {
+        await userUseCase.userDelete(req.body.id);
+        res.redirect('/');
     },
     apiAuthenticate: async(req, res, next) => {
-        await db.User.findOne({
-            where: {
-                email: req.body.email,
-                password: req.body.password,
+        const user = userUseCase.findForPayload(req.body);
+        if (user != null) {
+            const payload = {
+                id: user.id,
+                email: user.email,
+                password: user.password
             }
-        }).then(usr => {
-            if (usr != null) {
-                const payload = {
-                    id: usr.id,
-                    email: usr.email,
-                    password: usr.password
-                }
-                const token = jsonWebToken.sign(payload, process['JWT_SECRET']);
-                req.session.token = token;
-                req.session.user = usr;
-                next()
-            } else {
-                res.render('layout', { layout_name: 'error', title: 'ERROR', msg: 'ユーザーが見つかりませんでした。' });
-                res.sendStatus(500)
-            }
-        })
+            const token = jsonWebToken.sign(payload, process['JWT_SECRET']);
+            req.session.token = token;
+            req.session.user = user;
+            next()
+        } else {
+            res.render('layout', { layout_name: 'error', title: 'ERROR', msg: 'ユーザーが見つかりませんでした。' });
+        }
     },
     verifyJWT: (req, res, next) => {
         const token = req.session.token
@@ -123,33 +90,17 @@ module.exports = {
     myProf: async(req, res, next) => {
         //userIdを引き取る
         const UserId = req.session.user.id;
-        //userIdでユーザー情報を取得
-        await db.User.findOne({
-            where: {
-                id: UserId
-            }
-        }).then(user => {
-            //取得したuser情報をもとに画面にレンダリング
-            const data = {
-                title: 'マイプロフィール',
-                user: user,
-                err: null
-            }
-            res.render('layout', { layout_name: 'myprof', data });
-        })
+        const oneUser = await userUseCase.findOneUser(res, UserId);
+        //取得したuser情報をもとに画面にレンダリング
+        const data = {
+            title: 'マイプロフィール',
+            user: oneUser,
+            err: null
+        }
+        res.render('layout', { layout_name: 'myprof', data });
     },
     imageUpload: async(req, res, next) => {
-        const UserId = req.session.user.id;
-        await db.User.update({
-                image: req.session.user.id + req.session.user.name + ".jpg",
-            }, {
-                where: { id: UserId, }
-            })
-            .then(() => {
-                res.redirect('/user/' + UserId)
-            })
-            .catch((err) => {
-                res.render('layout', { layout_name: 'error', title: 'ERROR', msg: err });
-            })
+        await userUseCase.userImageUpload(res, req.session.user)
+        res.redirect('/user/' + req.session.user.id)
     }
 }
