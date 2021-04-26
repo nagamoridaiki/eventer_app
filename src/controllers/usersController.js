@@ -1,12 +1,22 @@
 "use strict";
 
 const User = require("../models/user")
+const Event = require("../models/event")
+const Join = require("../models/join")
+const Tag = require("../models/tag")
+const EventTag = require("../models/eventtag")
 const jsonWebToken = require('jsonwebtoken')
 const db = require('../models/index')
 const httpStatus = require('http-status');
 const process = require('../config/process.js');
-const multer = require('multer')
+const moment = require('moment')
+const eventUseCase = require('../usecase/events')
+const tagUseCase = require('../usecase/tags')
+const userUseCase = require('../usecase/users')
+const joinUseCase = require('../usecase/joins')
 
+
+const multer = require('multer')
 const storage = multer.diskStorage({
     destination: function(req, file, cb) {
         cb(null, 'uploads/')
@@ -17,15 +27,11 @@ const storage = multer.diskStorage({
 })
 const upload = multer({ storage: storage })
 
-
 module.exports = {
     login: async(req, res, next) => {
         const data = {
             title: 'login',
-            login: {
-                image: null
-            },
-
+            login: null
         }
         res.render('layout', { layout_name: 'login', title: 'login', data });
     },
@@ -36,60 +42,34 @@ module.exports = {
         }
         res.render('layout', { layout_name: 'Register', title: 'Register', data });
     },
-    index: (req, res, next) => {
-        db.User.findAll()
-            .then(users => {
-                res.locals.users = users;
-                const data = {
-                title: 'login',
-                login: req.session.user,
-            }
-            res.render('layout', { layout_name: 'index', title: 'login', data });
-            })
-            .catch(error => {
-                res.render('layout', { layout_name: 'error', title: 'ERROR', msg: 'ユーザー情報取得に失敗しました。' });
-                res.sendStatus(500)
-            });
+
+    index: async(req, res, next) => {
+        const users = await userUseCase.userGetAll();
+        const data = {
+            title: 'Register',
+            login: req.session.user,
+            users: users
+        }
+        res.render("layout", { layout_name: 'index', title: 'Index', data} );
     },
     indexView: (req, res) => {
         res.render("layout", { layout_name: 'index', title: 'Index' });
     },
-    create: (req, res, next) => {
-        const form = {
-            name: req.body.name,
-            password: req.body.password,
-            email: req.body.email,
-        };
-        db.sequelize.sync()
-            .then(() => db.User.create(form)
-                .then(usr => {
-                    const payload = {
-                        id: usr.id,
-                        email: usr.email,
-                        password: usr.password
-                    }
-                    console.log("payload", payload) //{ id: 1, name: 'Taro', password: 'yamada' }
-                    const token = jsonWebToken.sign(payload, 'secret');
-                    req.session.token = token;
-                    res.redirect('/')
-                })
-                .catch(error => {
-                    res.render('layout', { layout_name: 'error', title: 'ERROR', msg: 'ユーザー作成に失敗しました。' });
-                    res.sendStatus(500)
-                })
-            )
+    create: async(req, res, next) => {
+        const newUser = await userUseCase.userCreate(res, req.body);
+        const payload = {
+            id: newUser.id,
+            email: newUser.email,
+            password: newUser.password
+        }
+        console.log("payload", payload) //{ id: 1, name: 'Taro', password: 'yamada' }
+        const token = jsonWebToken.sign(payload, 'secret');
+        req.session.token = token;
+        res.redirect('/')
     },
-    delete: (req, res, next) => {
-        db.sequelize.sync()
-            .then(() => db.User.destroy({
-                where: { id: req.body.id }
-            }))
-            .then(usr => {
-                res.redirect('/');
-            }).catch(error => {
-                res.render('layout', { layout_name: 'error', title: 'ERROR', msg: 'ユーザー削除に失敗しました。' });
-                res.sendStatus(500)
-            });
+    delete: async(req, res, next) => {
+        await userUseCase.userDelete(res, req.body.id);
+        res.redirect('/');
     },
     apiAuthenticate: async(req, res, next) => {
         await db.User.findOne({
@@ -138,33 +118,18 @@ module.exports = {
     myProf: async(req, res, next) => {
         //userIdを引き取る
         const UserId = req.session.user.id;
-        //userIdでユーザー情報を取得
-        await db.User.findOne({
-            where: {
-                id: UserId
-            }
-        }).then(user => {
-            //取得したuser情報をもとに画面にレンダリング
-            const data = {
-                title: 'マイプロフィール',
-                user: user,
-                err: null
-            }
-            res.render('layout', { layout_name: 'myprof', data });
-        })
+        const oneUser = await userUseCase.findOneUser(res, UserId);
+        //取得したuser情報をもとに画面にレンダリング
+        const data = {
+            title: 'マイプロフィール',
+            user: oneUser,
+            err: null,
+            login: oneUser,
+        }
+        res.render('layout', { layout_name: 'myprof', data });
     },
     imageUpload: async(req, res, next) => {
-        const UserId = req.session.user.id;
-        await db.User.update({
-                image: req.session.user.id + req.session.user.name + ".jpg",
-            }, {
-                where: { id: UserId, }
-            })
-            .then(() => {
-                res.redirect('/user/' + UserId)
-            })
-            .catch((err) => {
-                res.render('layout', { layout_name: 'error', title: 'ERROR', msg: err });
-            })
+        await userUseCase.userImageUpload(res, req.session.user)
+        res.redirect('/user/' + req.session.user.id)
     }
 }

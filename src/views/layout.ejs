@@ -30,9 +30,9 @@
             <li class="nav-item"><a href="/events/history" class="nav-link">過去に参加した履歴</a></li>
           </ul>
         </div>
-        <%if (data.login.image) {%>
+        <%if (data.login) {%>
             <div style="color: #efeff5;">Login as <%= data.login.name %>　</div>
-        <img src="/images/<%= data.login.image %>" width="4%" height="4%" style="text-align: right;"/>
+            <%if (data.login.image) {%><img src="/images/<%= data.login.image %>" width="4%" height="4%" style="text-align: right;"/><% } %>
         <% } %>
     </nav>
     <!-- Optional JavaScript -->

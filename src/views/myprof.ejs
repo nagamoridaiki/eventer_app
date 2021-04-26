@@ -12,6 +12,7 @@
 
 <body class="container">
     <header>
+        <%if (data.login) {%>
         <form action="/image" method="post" enctype="multipart/form-data">
             <img src="/images/<%= data.user.image %>" width="10%" height="10%" />
             <br> 画像ファイル選択
@@ -20,6 +21,7 @@
             <br>
             <input type="submit" name="botan" value="送信">
         </form>
+        <% } %>
     </header>
     <div role="main">
         <div class="data-form">

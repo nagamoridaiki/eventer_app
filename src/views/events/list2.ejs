@@ -64,8 +64,13 @@
                                     </ul>
                                     参加人数: <%= data.content[i].User.length %>人
 
-
-                                
+                                    <%if (data.content[i].userId == data.login.id) {%>
+                                    <a href="events/edit/<%= data.content[i].id %>" class="btn btn-primary">編集する</a>
+                                    <% } %>
+                                    <%if (data.content[i].userId == data.login.id) {%>
+                                        <a href="events/delete/<%= data.content[i].id %>" class="btn btn-primary">削除する</a>
+                                    <% } %>
+                                            
                                 </div>
                             </div>
                         </div>
