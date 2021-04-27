@@ -164,7 +164,7 @@ module.exports = {
             err: null,
             holdDate: holdDate,
         }
-        res.render('layout', { layout_name: 'events/show', data });
+        res.render('layout', { layout_name: 'events/show2', data });
     },
     delete: async(req, res, next) => {
         const deletedEventId = await eventUseCase.eventDelete(req.params.id);

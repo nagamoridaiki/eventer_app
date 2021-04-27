@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>
+        <%= data.title %>
+    </title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" crossorigin="anonymous">
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel='stylesheet' href='/stylesheets/bootstrap.min.css' />
+</head>
+
+
+<body>
+    <header>
+            <img src="/images/eventDetail.png %>"  width="100%" height="100%" class="flex-row-reverse text-white mb-4"/>
+    </header>
+
+    <h2 class="mt-5"><%= data.event.title %></h2>
+    <hr class="mt-0 mb-2">
+    <p><%= data.event.subTitle %></p>
+    <nav>
+        <ul class="list-inline">
+            <% if (data.event.Tag!=null) { for (let i in data.event.Tag) { %>
+                <li class="list-inline-item bg-info text-white p-1" style="border-radius: 0.7em;"><%= data.event.Tag[i].name %></li>
+            <% }} %>
+        </ul>
+    </nav>
+
+  <div class="row mt-4">
+        <div class="col-md-6">
+            <img src="/images/<%= data.event.image %>" width="300" height="300">
+        </div>
+
+        <div class="col-md-6 mt-4 mt-md-0">
+            詳細
+            <hr class="mt-0 mb-2">
+            <div class="tab-content bg-light p-3">
+                <%= data.event.detail %>
+            </div>
+            参加人数
+            <hr class="mt-0 mb-2">
+            <div class="tab-content bg-light p-3">
+                <%= data.event.User.length %>/<%= data.event.capacity %>(定員)
+            </div>
+        </div>
+    </div>
+
+    <%if (data.isJoin == true) {%>
+        <form method="post" action="/events/join">
+            <input type="hidden" name="userId" value="<%= data.login.id %>">
+            <input type="hidden" name="eventId" value="<%= data.event.id %>">
+            <input class="btn btn-primary" type="submit" value="参加しない">
+        </form>
+    <% } %>
+    <%if (data.isJoin == false) {%>
+        <form method="post" action="/events/join">
+            <input type="hidden" name="userId" value="<%= data.login.id %>">
+            <input type="hidden" name="eventId" value="<%= data.event.id %>">
+            <input class="btn btn-success" type="submit" value="参加する">
+        </form>
+    <% } %>
+    <%if (data.event.userId == data.login.id) {%>
+        <a href="/events/delete/<%= data.event.id %>" class="btn btn-primary">削除する</a>
+    <% } %>
+
+        
+
+<script src="/javascripts/jquery-3.3.1.slim.min.js"></script>
+<script src="/src/public/javascripts/bootstrap.bundle.min.js"></script>
+<script src="/src/public/javascripts/jquery-3.3.1.slim.min.js"></script>
+</body>
+</html>
