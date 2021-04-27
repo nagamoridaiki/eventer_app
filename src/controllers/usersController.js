@@ -126,7 +126,7 @@ module.exports = {
             err: null,
             login: oneUser,
         }
-        res.render('layout', { layout_name: 'myprof', data });
+        res.render('layout', { layout_name: 'myprof2', data });
     },
     imageUpload: async(req, res, next) => {
         await userUseCase.userImageUpload(res, req.session.user)

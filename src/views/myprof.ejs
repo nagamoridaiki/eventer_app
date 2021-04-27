@@ -14,7 +14,7 @@
     <header>
         <%if (data.login) {%>
         <form action="/image" method="post" enctype="multipart/form-data">
-            <img src="/images/<%= data.user.image %>" width="10%" height="10%" />
+            <img src="/images/<%= data.user.image %>" width="10%" height="10%" class=""/>
             <br> 画像ファイル選択
             <br>
             <input type="file" name="file">
