@@ -70,13 +70,23 @@ module.exports = {
         //全タグ情報取得
         const tagAllData = await tagUseCase.tagGetAll();
 
+        let holdDate = [];
+        let history = oneUser.Event;
+        history.forEach(function(oneEventData, key ) {
+            //開催日時情報
+            holdDate.push(eventUseCase.getHoldDate(oneEventData)); 
+        });
+
         const data = {
             title: 'History',
             login: req.session.user,
-            content: oneUser.Event,
+            content: {
+                event: oneUser.Event,
+                holdDate: holdDate,
+            },
             Tags: tagAllData,
         }
-        res.render('layout', { layout_name: 'events/history', data });
+        res.render('layout', { layout_name: 'events/history2', data });
 
     },
     add: (req, res, next) => {
