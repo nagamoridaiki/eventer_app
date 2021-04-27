@@ -14,7 +14,7 @@
 
 <body>
     <header>
-            <img src="/images/bookimage2.png %>"  width="100%" height="100%" class="flex-row-reverse"/>
+            <img src="/images/eventList.png %>"  width="100%" height="100%" class="flex-row-reverse"/>
     </header>
 
         <div class="row">
@@ -72,7 +72,7 @@
                                         <dd><%= data.content.holdDate[i].Year %>年<%= data.content.holdDate[i].Month %>月<%= data.content.holdDate[i].Date %>日</dd>
                                         <!-- title -->
                                         <a href="events/show/<%= data.content.event[i].id %>">
-                                            <h3><%= data.content.event[i].title %></h5>
+                                            <h5><%= data.content.event[i].title %></h5>
                                         </a>
                                         <!-- subTitle -->
                                         <dd><%= data.content.event[i].subTitle %></dd>
@@ -83,7 +83,7 @@
                                             <li class="list-inline-item bg-info text-white p-1" style="border-radius: 0.7em;"><%= data.content.event[i].Tag[n].name %></li>
                                         <% }} %>
                                     </ul>
-                                    参加人数: <%= data.content.event[i].User.length %>人
+                                    参加状況: <br><%= data.content.event[i].User.length %> /<%= data.content.event[i].capacity %>人 (定員)
                                 </div>
                             </div>
                         </div>

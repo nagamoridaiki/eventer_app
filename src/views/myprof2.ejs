@@ -20,9 +20,26 @@
                     </div>
                     <div class="col-7">
                         <div class="card-body">
-                            <h5 class="card-title"><%= data.user.name %></h5>
-                            <p class="card-text">mail : <%= data.user.email %></p>
-                            <p class="card-text">password : <%= data.user.password %></p>
+                            名前
+                            <hr class="mt-0 mb-2">
+                            <div class="tab-content bg-light p-3">
+                                <%= data.user.name %>
+                            </div>
+                            メールアドレス
+                            <hr class="mt-0 mb-2">
+                            <div class="tab-content bg-light p-3">
+                                <%= data.user.email %>
+                            </div>
+                            パスワード
+                            <hr class="mt-0 mb-2">
+                            <div class="tab-content bg-light p-3">
+                                <%= data.user.password %>
+                            </div>
+                            登録日時
+                            <hr class="mt-0 mb-2">
+                            <div class="tab-content bg-light p-3">
+                                <%= data.user.createdAt %>
+                            </div>
                         </div>
                     </div>
                 </div>            
