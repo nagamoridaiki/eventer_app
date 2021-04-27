@@ -14,12 +14,9 @@
 
 <body>
     <header>
-        <h1 class="">
             <img src="/images/bookimage2.png %>"  width="100%" height="100%" class="flex-row-reverse"/>
-        </h1>
     </header>
 
-    <div class="row">
         <div class="row">
             <!-- サイドバー -->
             <div class="col-2">
@@ -33,44 +30,60 @@
                     </ul>
                 </nav>
             </div>
-            <div class="col-10">
+            <div class="col-9">
                 <div class="row">
                     <div class="col-12"><h3>新着情報</h3></div>
                 </div>
                 <div class="row">
-                    <% for(let i in data.content) { %>
+                    <% for(let i in data.content.event) { %>
                         <div class="col-6" style="padding-bottom: 2rem;" >
                             <div class="row">
                                 <!-- image -->
                                 <div class="col-6" style="height:150px;">
-                                    <img src="/images/<%= data.content[i].image %>" width="100%" height="100%" class="flex-row-reverse"/>
+                                    <%if (data.content.event[i].image != null) {%>
+                                    <img src="/images/<%= data.content.event[i].image %>" width="100%" height="100%" class="flex-row-reverse"/>
+                                    <% } else {%>
+                                    <img src="/images/noimage-1.jpg" width="100%" height="100%" class="flex-row-reverse"/>
+                                    <% } %>
                                 </div>
                                 <div class="col-6">
+                                    <!-- edit delete -->
+                                    <%if (data.content.event[i].userId == data.login.id) {%>
+                                    <div class="ml-auto card-text" style="float: right;">
+                                        <div class="dropdown">
+                                          <a data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                          </a>
+                                          <div class="dropdown-menu dropdown-menu-right">
+                                            <a class="dropdown-item" href="events/edit/<%= data.content.event[i].id %>">
+                                              <i class="fas fa-pen mr-1"></i>記事を更新する
+                                            </a>
+                                            <div class="dropdown-divider"></div>
+                                            <a class="dropdown-item" href="events/delete/<%= data.content.event[i].id %>">
+                                                <i class="fas fa-trash-alt mr-1"></i>記事を削除する
+                                            </a>
+                                          </div>
+                                        </div>
+                                    </div>
+                                    <% } %>
+
                                     <dl>
                                         <!-- holdDate -->
-                                        <dd><%= data.content[i].holdDateYear %>年<%= data.content[i].holdDateMonth %>月<%= data.content[i].holdDateDate %>日</dd>
+                                        <dd><%= data.content.holdDate[i].Year %>年<%= data.content.holdDate[i].Month %>月<%= data.content.holdDate[i].Date %>日</dd>
                                         <!-- title -->
-                                        <a href="events/show/<%= data.content[i].id %>">
-                                            <h3><%= data.content[i].title %></h5>
+                                        <a href="events/show/<%= data.content.event[i].id %>">
+                                            <h3><%= data.content.event[i].title %></h5>
                                         </a>
                                         <!-- subTitle -->
-                                        <dd><%= data.content[i].subTitle %></dd>
+                                        <dd><%= data.content.event[i].subTitle %></dd>
                                     </dl>
                                     <!-- Tag -->
                                     <ul class="list-inline">
-                                        <% if (data.content[i].Tag!=null) { for (let n in data.content[i].Tag) { %>
-                                            <li class="list-inline-item bg-info text-white p-1" style="border-radius: 0.7em;"><%= data.content[i].Tag[n].name %></li>
+                                        <% if (data.content.event[i].Tag!=null) { for (let n in data.content.event[i].Tag) { %>
+                                            <li class="list-inline-item bg-info text-white p-1" style="border-radius: 0.7em;"><%= data.content.event[i].Tag[n].name %></li>
                                         <% }} %>
                                     </ul>
-                                    参加人数: <%= data.content[i].User.length %>人
-
-                                    <%if (data.content[i].userId == data.login.id) {%>
-                                    <a href="events/edit/<%= data.content[i].id %>" class="btn btn-primary">編集する</a>
-                                    <% } %>
-                                    <%if (data.content[i].userId == data.login.id) {%>
-                                        <a href="events/delete/<%= data.content[i].id %>" class="btn btn-primary">削除する</a>
-                                    <% } %>
-                                            
+                                    参加人数: <%= data.content.event[i].User.length %>人
                                 </div>
                             </div>
                         </div>
@@ -78,8 +91,7 @@
                 </div>
             </div>
         </div>
-    </div>
-    </div>
+
 
 <script src="/javascripts/jquery-3.3.1.slim.min.js"></script>
 <script src="/src/public/javascripts/bootstrap.bundle.min.js"></script>

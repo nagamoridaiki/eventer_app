@@ -22,10 +22,19 @@ module.exports = {
         //全タグ情報取得
         const tagAllData = await tagUseCase.tagGetAll();
 
+        let holdDate = [];
+        eventAllData.forEach(function(oneEventData, key ) {
+            //開催日時情報
+            holdDate.push(eventUseCase.getHoldDate(oneEventData)); 
+        });
+
         const data = {
             title: 'Event',
             login: req.session.user,
-            content: eventAllData,
+            content: {
+                event: eventAllData,
+                holdDate: holdDate,
+            },
             Tags: tagAllData,
         }
         res.render('layout', { layout_name: 'events/list2', data });
