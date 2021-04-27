@@ -22,13 +22,22 @@ module.exports = {
         //全タグ情報取得
         const tagAllData = await tagUseCase.tagGetAll();
 
+        let holdDate = [];
+        eventAllData.forEach(function(oneEventData, key ) {
+            //開催日時情報
+            holdDate.push(eventUseCase.getHoldDate(oneEventData)); 
+        });
+
         const data = {
             title: 'Event',
             login: req.session.user,
-            content: eventAllData,
+            content: {
+                event: eventAllData,
+                holdDate: holdDate,
+            },
             Tags: tagAllData,
         }
-        res.render('layout', { layout_name: 'events/list', data });
+        res.render('layout', { layout_name: 'events/list2', data });
 
     },
     search: async(req, res, next) => {
@@ -57,17 +66,27 @@ module.exports = {
     history: async(req, res, next) => {
         //userIdを引き取る
         const userId = req.session.user.id;
-        const oneUser = await userUseCase.findOneUser(userId);
+        const oneUser = await userUseCase.findOneUser(res, userId);
         //全タグ情報取得
         const tagAllData = await tagUseCase.tagGetAll();
+
+        let holdDate = [];
+        let history = oneUser.Event;
+        history.forEach(function(oneEventData, key ) {
+            //開催日時情報
+            holdDate.push(eventUseCase.getHoldDate(oneEventData)); 
+        });
 
         const data = {
             title: 'History',
             login: req.session.user,
-            content: oneUser.Event,
+            content: {
+                event: oneUser.Event,
+                holdDate: holdDate,
+            },
             Tags: tagAllData,
         }
-        res.render('layout', { layout_name: 'events/history', data });
+        res.render('layout', { layout_name: 'events/history2', data });
 
     },
     add: (req, res, next) => {
@@ -76,7 +95,7 @@ module.exports = {
             login: req.session.user,
             err: null
         }
-        res.render('layout', { layout_name: 'events/add', data });
+        res.render('layout', { layout_name: 'events/add2', data });
     },
     create: async(req, res, next) => {
         //イベント作成
@@ -104,7 +123,7 @@ module.exports = {
             err: null,
             holdDate: holdDate,
         }
-        res.render('layout', { layout_name: 'events/edit', data });
+        res.render('layout', { layout_name: 'events/edit2', data });
 
     },
     update: async(req, res, next) => {
@@ -117,7 +136,7 @@ module.exports = {
         const EventId = req.params.id;
         const findEvent = await eventUseCase.findOneEvent(EventId);
         //古いイベントタグ紐付け情報をいったん消す
-        await tagUseCase.eventTagDestroy(EventId);
+        await tagUseCase.eventTagDestroy(res, EventId);
         //タグ作成およびイベントとの紐付け
         let tags = JSON.parse(req.body.tags);
         //tagの数だけ繰り返す
@@ -142,7 +161,7 @@ module.exports = {
             }
         });
         //イベントの投稿者
-        const writter = await userUseCase.findOneUser(oneEvent.userId);
+        const writter = await userUseCase.findOneUser(res, oneEvent.userId);
         //開催日時情報
         const holdDate = await eventUseCase.getHoldDate(oneEvent);
 
@@ -155,12 +174,12 @@ module.exports = {
             err: null,
             holdDate: holdDate,
         }
-        res.render('layout', { layout_name: 'events/show', data });
+        res.render('layout', { layout_name: 'events/show2', data });
     },
     delete: async(req, res, next) => {
         const deletedEventId = await eventUseCase.eventDelete(req.params.id);
         //イベントタグ情報を消す
-        await tagUseCase.eventTagDestroy(deletedEventId);
+        await tagUseCase.eventTagDestroy(res, deletedEventId);
         //参加状況を消す
         await joinUseCase.destroy(deletedEventId);
         res.redirect('/events');

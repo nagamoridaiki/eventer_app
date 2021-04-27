@@ -1,13 +1,22 @@
 "use strict";
 
 const User = require("../models/user")
+const Event = require("../models/event")
+const Join = require("../models/join")
+const Tag = require("../models/tag")
+const EventTag = require("../models/eventtag")
 const jsonWebToken = require('jsonwebtoken')
 const db = require('../models/index')
 const httpStatus = require('http-status');
 const process = require('../config/process.js');
-const multer = require('multer')
+const moment = require('moment')
+const eventUseCase = require('../usecase/events')
+const tagUseCase = require('../usecase/tags')
 const userUseCase = require('../usecase/users')
+const joinUseCase = require('../usecase/joins')
 
+
+const multer = require('multer')
 const storage = multer.diskStorage({
     destination: function(req, file, cb) {
         cb(null, 'uploads/')
@@ -18,18 +27,30 @@ const storage = multer.diskStorage({
 })
 const upload = multer({ storage: storage })
 
-
 module.exports = {
     login: async(req, res, next) => {
-        res.render('layout', { layout_name: 'login', title: 'login' });
+        const data = {
+            title: 'login',
+            login: null
+        }
+        res.render('layout', { layout_name: 'login', title: 'login', data });
     },
     register: async(req, res, next) => {
-        res.render('layout', { layout_name: 'Register', title: 'Register' });
+        const data = {
+            title: 'Register',
+            login: req.session.user,
+        }
+        res.render('layout', { layout_name: 'Register', title: 'Register', data });
     },
+
     index: async(req, res, next) => {
         const users = await userUseCase.userGetAll();
-        res.locals.users = users;
-        next();
+        const data = {
+            title: 'Register',
+            login: req.session.user,
+            users: users
+        }
+        res.render("layout", { layout_name: 'index', title: 'Index', data} );
     },
     indexView: (req, res) => {
         res.render("layout", { layout_name: 'index', title: 'Index' });
@@ -47,24 +68,31 @@ module.exports = {
         res.redirect('/')
     },
     delete: async(req, res, next) => {
-        await userUseCase.userDelete(req.body.id);
+        await userUseCase.userDelete(res, req.body.id);
         res.redirect('/');
     },
     apiAuthenticate: async(req, res, next) => {
-        const user = userUseCase.findForPayload(req.body);
-        if (user != null) {
-            const payload = {
-                id: user.id,
-                email: user.email,
-                password: user.password
+        await db.User.findOne({
+            where: {
+                email: req.body.email,
+                password: req.body.password,
             }
-            const token = jsonWebToken.sign(payload, process['JWT_SECRET']);
-            req.session.token = token;
-            req.session.user = user;
-            next()
-        } else {
-            res.render('layout', { layout_name: 'error', title: 'ERROR', msg: 'ユーザーが見つかりませんでした。' });
-        }
+        }).then(usr => {
+            if (usr != null) {
+                const payload = {
+                    id: usr.id,
+                    email: usr.email,
+                    password: usr.password
+                }
+                const token = jsonWebToken.sign(payload, process['JWT_SECRET']);
+                req.session.token = token;
+                req.session.user = usr;
+                next()
+            } else {
+                res.render('layout', { layout_name: 'error', title: 'ERROR', msg: 'ユーザーが見つかりませんでした。' });
+                res.sendStatus(500)
+            }
+        })
     },
     verifyJWT: (req, res, next) => {
         const token = req.session.token
@@ -95,9 +123,10 @@ module.exports = {
         const data = {
             title: 'マイプロフィール',
             user: oneUser,
-            err: null
+            err: null,
+            login: oneUser,
         }
-        res.render('layout', { layout_name: 'myprof', data });
+        res.render('layout', { layout_name: 'myprof2', data });
     },
     imageUpload: async(req, res, next) => {
         await userUseCase.userImageUpload(res, req.session.user)

@@ -12,16 +12,19 @@ const process = require('../config/process.js');
 const moment = require('moment')
 
 module.exports = {
-    findOneUser: async function (userId) {
+    findOneUser: async function (res, userId) {
         const oneUser = await db.User.findOne({
             where: {
                 id: userId
             },
             include: ['Event'],
-        })
+        }).catch(err => {
+            res.render('layout', { layout_name: 'error', title: 'ERROR', msg: err });
+        });
         return oneUser
     },
     findForPayload: async function (res, params) {
+        console.log("params", params)
         const oneUser = await db.User.findOne({
             where: {
                 email: params.email,
