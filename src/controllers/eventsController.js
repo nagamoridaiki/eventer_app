@@ -123,7 +123,7 @@ module.exports = {
             err: null,
             holdDate: holdDate,
         }
-        res.render('layout', { layout_name: 'events/edit', data });
+        res.render('layout', { layout_name: 'events/edit2', data });
 
     },
     update: async(req, res, next) => {
