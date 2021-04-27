@@ -85,7 +85,7 @@ module.exports = {
             login: req.session.user,
             err: null
         }
-        res.render('layout', { layout_name: 'events/add', data });
+        res.render('layout', { layout_name: 'events/add2', data });
     },
     create: async(req, res, next) => {
         //イベント作成
