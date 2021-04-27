@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>
+        <%= data.title %>
+    </title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" crossorigin="anonymous">
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+</head>
+
+<body class="container">
+    <header>
+        <h1 class="display-4">
+            <%= data.title %>
+        </h1>
+    </header>
+    <div role="main">
+        <div class="data-form">
+            <form class="form-signin" action="/user/<%= data.user.id %>/update" method="POST">
+                <input type="hidden" name="id" value="<%= data.user.id %>">
+                <h2 class="form-signin-heading">Edit a user:</h2>
+                <label for="name">Name</label>
+                <input type="text" name="name" id="name" value="<%= data.user.name %>" class="form-control" placeholder="name" autofocus required>
+                <label for="inputEmail">Email address</label>
+                <input type="email" name="email" id="inputEmail" value="<%= data.user.email %>" class="form-control" placeholder="Email address" required>
+                <label for="inputPassword">Password</label>
+                <input type="password" name="password" id="inputPassword"  value="<%= data.user.password %>" class="form-control" placeholder="Password" required>
+                <label for="passwordConfirm">Password Confirm</label>
+                <input type="password" name="passwordConfirm" id="passwordConfirm"   value="<%= data.user.password %>" class="form-control" placeholder="Password" required>
+                <br /><button class="btn btn-lg btn-primary btn-block" type="submit">edit</button>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>

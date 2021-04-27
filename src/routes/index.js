@@ -26,6 +26,9 @@ router.post('/delete/', usersController.verifyJWT, usersController.delete, users
 router.get('/', usersController.verifyJWT, usersController.index, usersController.indexView);
 router.get('/logout', usersController.logout)
 router.get('/user/:id', usersController.verifyJWT, usersController.myProf);
+router.get('/user/:id/edit', usersController.verifyJWT, usersController.Edit);
+router.post('/user/:id/update', usersController.verifyJWT, usersController.update);
+
 router.post('/image', usersController.verifyJWT, upload.single('file'), usersController.imageUpload)
 router.get('/add', usersController.verifyJWT, eventsController.add);
 
