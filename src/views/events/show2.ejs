@@ -49,6 +49,12 @@
             <div class="tab-content bg-light p-3">
                 <%= data.event.User.length %>/<%= data.event.capacity %>(定員)
             </div>
+            お気に入りにされた数
+            <hr class="mt-0 mb-2">
+            <div class="tab-content bg-light p-3">
+                <%= data.event.UserFavorite.length %>
+            </div>
+
         </div>
     </div>
 
@@ -68,6 +74,21 @@
     <% } %>
     <%if (data.event.userId == data.login.id) {%>
         <a href="/events/delete/<%= data.event.id %>" class="btn btn-primary">削除する</a>
+    <% } %>
+
+    <%if (data.isFavorite == true) {%>
+        <form method="post" action="/events/Favorite">
+            <input type="hidden" name="userId" value="<%= data.login.id %>">
+            <input type="hidden" name="eventId" value="<%= data.event.id %>">
+            <input class="btn btn-primary" type="submit" value="お気に入りを外す">
+        </form>
+    <% } %>
+    <%if (data.isFavorite == false) {%>
+        <form method="post" action="/events/Favorite">
+            <input type="hidden" name="userId" value="<%= data.login.id %>">
+            <input type="hidden" name="eventId" value="<%= data.event.id %>">
+            <input class="btn btn-success" type="submit" value="お気に入りに登録する">
+        </form>
     <% } %>
 
         

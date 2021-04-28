@@ -83,7 +83,12 @@
                                             <li class="list-inline-item bg-info text-white p-1" style="border-radius: 0.7em;"><%= data.content.event[i].Tag[n].name %></li>
                                         <% }} %>
                                     </ul>
+                                    <!-- Join -->
                                     参加状況: <br><%= data.content.event[i].User.length %> /<%= data.content.event[i].capacity %>人 (定員)
+                                    <!-- Favorite -->
+                                    <br>
+                                    <br>
+                                    お気に入り登録者: <br><%= data.content.event[i].UserFavorite.length %>
                                 </div>
                             </div>
                         </div>

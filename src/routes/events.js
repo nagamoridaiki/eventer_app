@@ -26,5 +26,7 @@ router.get('/delete/:id', usersController.verifyJWT, eventsController.delete);
 router.post('/join', usersController.verifyJWT, eventsController.join);
 router.get('/search/:TagName', usersController.verifyJWT, eventsController.search);
 router.get('/history', usersController.verifyJWT, eventsController.history);
+router.post('/Favorite', usersController.verifyJWT, eventsController.favorite);
+router.get('/FavoriteList', usersController.verifyJWT, eventsController.FavoriteList);
 
 module.exports = router;

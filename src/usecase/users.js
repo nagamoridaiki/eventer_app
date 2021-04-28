@@ -17,7 +17,7 @@ module.exports = {
             where: {
                 id: userId
             },
-            include: ['Event'],
+            include: ['Event', 'FavoriteEvent'],
         }).catch(err => {
             res.render('layout', { layout_name: 'error', title: 'ERROR', msg: err });
         });

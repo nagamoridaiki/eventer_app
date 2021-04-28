@@ -14,7 +14,7 @@ const moment = require('moment')
 module.exports = {
     eventGetAll: async function () {
         const allEvent = await db.Event.findAll({
-            include: ['User', 'Tag'],
+            include: ['User', 'Tag', 'UserFavorite'],
             order: [
                 ['id', 'DESC']
             ],
@@ -26,7 +26,7 @@ module.exports = {
             where: {
                 id: EventId,
             },
-            include: ['User', 'Tag'],
+            include: ['User', 'Tag', 'UserFavorite'],
         })
         return oneEvent
     },
