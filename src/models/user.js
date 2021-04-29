@@ -28,6 +28,11 @@ module.exports = (sequelize, DataTypes) => {
             as: 'Event',
             foreignKey: 'userId'
         });
+        User.belongsToMany(models.Event, {
+            through: 'Favorite',
+            as: 'FavoriteEvent',
+            foreignKey: 'userId'
+        });
     };
     return User;
 };

@@ -66,6 +66,11 @@ module.exports = (sequelize, DataTypes) => {
             as: 'Tag',
             foreignKey: 'eventId'
         });
+        Event.belongsToMany(models.User, {
+            through: 'Favorite',
+            as: 'UserFavorite',
+            foreignKey: 'eventId'
+        });
     };
     return Event;
 };

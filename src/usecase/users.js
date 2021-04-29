@@ -17,7 +17,7 @@ module.exports = {
             where: {
                 id: userId
             },
-            include: ['Event'],
+            include: ['Event', 'FavoriteEvent'],
         }).catch(err => {
             res.render('layout', { layout_name: 'error', title: 'ERROR', msg: err });
         });
@@ -69,7 +69,20 @@ module.exports = {
             res.render('layout', { layout_name: 'error', title: 'ERROR', msg: err });
         });
         return newUser;
-    }
+    },
+    userUpdate: async function (res, params) {
+        const updatedUser = await db.User.update({
+            name: params.name,
+            password: params.password,
+            email: params.email,
+        },{
+            where: { id: params.id, }
+        }
+        ).catch(err => {
+            res.render('layout', { layout_name: 'error', title: 'ERROR', msg: err });
+        });
+        return updatedUser;
+    },
 
 
 }

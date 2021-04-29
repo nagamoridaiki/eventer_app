@@ -14,6 +14,9 @@ const eventUseCase = require('../usecase/events')
 const tagUseCase = require('../usecase/tags')
 const userUseCase = require('../usecase/users')
 const joinUseCase = require('../usecase/joins')
+const favoriteUseCase = require('../usecase/favorite')
+
+
 
 module.exports = {
     index: async(req, res, next) => {
@@ -23,10 +26,27 @@ module.exports = {
         const tagAllData = await tagUseCase.tagGetAll();
 
         let holdDate = [];
+        let favoriteLengthList = {};
         eventAllData.forEach(function(oneEventData, key ) {
             //開催日時情報
-            holdDate.push(eventUseCase.getHoldDate(oneEventData)); 
+            holdDate.push(eventUseCase.getHoldDate(oneEventData));
+            //各イベントにお気に入りがつけられた数
+            let favoriteLength = eventUseCase.getFavoriteLength(oneEventData)
+            favoriteLengthList[oneEventData.id] = favoriteLength//イベントのid : お気に入りの数
         });
+        let eventList = Object.keys(favoriteLengthList);
+
+        //お気に入りが一番ついているイベントのidを取得する。
+        //let favoriteEventList = eventUseCase.forGetMaxFavarite(eventList, favoriteLengthList);
+
+        let maxFavoriteEventId = eventUseCase.getMaxFavarite(eventList, favoriteLengthList)
+        const maxFavoriteEvent = await eventUseCase.findOneEvent(maxFavoriteEventId);
+
+        //2番目を取得する。
+        eventList.pop(maxFavoriteEventId)
+        let secondFavoriteEventId = eventUseCase.getMaxFavarite(eventList, favoriteLengthList)
+        const secondFavoriteEvent = await eventUseCase.findOneEvent(secondFavoriteEventId);
+
 
         const data = {
             title: 'Event',
@@ -36,6 +56,8 @@ module.exports = {
                 holdDate: holdDate,
             },
             Tags: tagAllData,
+            maxFavoriteEvent: maxFavoriteEvent,
+            secondFavoriteEvent: secondFavoriteEvent,
         }
         res.render('layout', { layout_name: 'events/list2', data });
 
@@ -152,7 +174,9 @@ module.exports = {
         const EventId = req.params.id;
         const oneEvent = await eventUseCase.findOneEvent(EventId);
         let isJoin = false;
+        let isFavorite = false;
         const joinUser = oneEvent.User;
+        const favoriteUser = oneEvent.UserFavorite;
 
         //あなたはそのイベントに参加予定か？
         joinUser.forEach(element => {
@@ -160,6 +184,13 @@ module.exports = {
                 isJoin = true;
             }
         });
+        //あなたはそのイベントをお気に入り登録しているか
+        favoriteUser.forEach(element => {
+            if (element.id == req.session.user.id) {
+                isFavorite = true;
+            }
+        });
+
         //イベントの投稿者
         const writter = await userUseCase.findOneUser(res, oneEvent.userId);
         //開催日時情報
@@ -170,6 +201,7 @@ module.exports = {
             login: req.session.user,
             event: oneEvent,
             isJoin: isJoin,
+            isFavorite: isFavorite,
             writter: writter,
             err: null,
             holdDate: holdDate,
@@ -191,5 +223,41 @@ module.exports = {
         joinData ? await joinUseCase.exit(res, req.body) : await joinUseCase.entry(res, req.body)
 
         res.redirect('/events');
-    }
+    },
+    favorite: async(req, res, next) => {
+        //お気に入りかを判定する。
+        const favoriteData = await favoriteUseCase.findOne(req.body);
+        //参加表明と参加辞退を切り替える
+        favoriteData ? await favoriteUseCase.exit(res, req.body) : await favoriteUseCase.entry(res, req.body)
+
+        res.redirect('/events');
+    },
+    FavoriteList: async(req, res, next) => {
+        //userIdを引き取る
+        const userId = req.session.user.id;
+        const oneUser = await userUseCase.findOneUser(res, userId);
+        //全タグ情報取得
+        const tagAllData = await tagUseCase.tagGetAll();
+
+        let holdDate = [];
+        let FavoriteList = oneUser.FavoriteEvent;
+        FavoriteList.forEach(function(oneEventData, key ) {
+            //開催日時情報
+            holdDate.push(eventUseCase.getHoldDate(oneEventData)); 
+        });
+
+        const data = {
+            title: 'Favorite',
+            login: req.session.user,
+            content: {
+                event: oneUser.FavoriteEvent,
+                holdDate: holdDate,
+            },
+            Tags: tagAllData,
+        }
+        res.render('layout', { layout_name: 'events/history2', data });
+
+    },
+
+
 }

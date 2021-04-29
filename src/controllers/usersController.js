@@ -128,6 +128,24 @@ module.exports = {
         }
         res.render('layout', { layout_name: 'myprof2', data });
     },
+    Edit: async(req, res, next) => {
+        //userIdを引き取る
+        const UserId = req.session.user.id;
+        const oneUser = await userUseCase.findOneUser(res, UserId);
+        //取得したuser情報をもとに画面にレンダリング
+        const data = {
+            title: 'プロフィール編集',
+            user: oneUser,
+            err: null,
+            login: oneUser,
+        }
+        res.render('layout', { layout_name: 'myprofEdit', data });
+    },
+    update: async(req, res, next) => {
+        const oneUser = await userUseCase.userUpdate(res, req.body);
+        //取得したuser情報をもとに画面にレンダリング
+        res.redirect('/user/' + req.session.user.id)
+    },
     imageUpload: async(req, res, next) => {
         await userUseCase.userImageUpload(res, req.session.user)
         res.redirect('/user/' + req.session.user.id)
