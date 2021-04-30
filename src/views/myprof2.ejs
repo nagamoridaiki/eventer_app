@@ -16,7 +16,11 @@
             <div class="card">
                 <div class="row">
                     <div class="col-3">
-                        <img src="/images/<%= data.user.image %>" width="100%" height="100%" class="img-fluid"/>
+                        <% if (data.user.image) {%>
+                            <img src="/img/upload_icon/<%= data.user.image %>" width="50%" height="50%" class="img-fluid"/>
+                        <% } else { %>
+                            <img src="/img/upload_icon/noperson.jpg" width="50%" height="50%" class="img-fluid"/>
+                        <% } %>
                     </div>
                     <div class="col-7">
                         <a href="/user/<%= data.user.id %>/edit">編集する</a>
@@ -48,12 +52,12 @@
         </div>  
     </div>
     <%if (data.login) {%>
-        <form action="/image" method="post" enctype="multipart/form-data">
+        <form action="/upload" method="post" enctype="multipart/form-data">
             <br> 画像ファイル選択
             <br>
-            <input type="file" name="file">
+            <input type="file" name="uploadFile">
             <br>
-            <input type="submit" name="botan" value="送信">
+            <input type="submit" value="Upload">
         </form>
     <% } %>
 

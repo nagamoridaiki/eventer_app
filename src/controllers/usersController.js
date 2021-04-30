@@ -14,6 +14,8 @@ const eventUseCase = require('../usecase/events')
 const tagUseCase = require('../usecase/tags')
 const userUseCase = require('../usecase/users')
 const joinUseCase = require('../usecase/joins')
+const path = require('path');
+const sharp = require('sharp');
 
 
 const multer = require('multer')
@@ -117,7 +119,7 @@ module.exports = {
     },
     myProf: async(req, res, next) => {
         //userIdを引き取る
-        const UserId = req.session.user.id;
+        const UserId = req.params.id;
         const oneUser = await userUseCase.findOneUser(res, UserId);
         //取得したuser情報をもとに画面にレンダリング
         const data = {
@@ -147,7 +149,12 @@ module.exports = {
         res.redirect('/user/' + req.session.user.id)
     },
     imageUpload: async(req, res, next) => {
-        await userUseCase.userImageUpload(res, req.session.user)
+        await userUseCase.fileUpload(req, res, next);
+        
         res.redirect('/user/' + req.session.user.id)
-    }
+    },
+    
+
+
+
 }
