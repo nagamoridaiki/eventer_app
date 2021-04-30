@@ -10,6 +10,8 @@ const db = require('../models/index')
 const httpStatus = require('http-status');
 const process = require('../config/process.js');
 const moment = require('moment')
+const path = require('path');
+const sharp = require('sharp');
 
 module.exports = {
     eventGetAll: async function () {
@@ -38,7 +40,7 @@ module.exports = {
             detail: params.detail,
             holdDate: params.holdDate,
             capacity: params.capacity,
-            image: EventId + "event.jpg",
+            //image: EventId + "event.jpg",
         }).catch((err) => {
             return err
         });
@@ -98,5 +100,68 @@ module.exports = {
             }
         }
         return maxEventId
-    }
+    },
+    fileUpload: async function (req, res, next, newEventId) {
+        try {
+    
+            if (!req.files || Object.keys(req.files).length === 0) {
+                return res.status(400).send('No files were uploaded');
+            }
+        
+            let uploadFile = req.files.uploadFile;
+        
+            // アップロードファイルは20MB以内
+            if (uploadFile.size > 20*1024*1024) {
+              return res.status(400).send('File size is too big');
+            }
+        
+            // 対応しているのはpng, jpg, gif, jpegのファイルとする
+            let uploadFileExt = path.extname(uploadFile.name);
+        
+            if(uploadFileExt !== '.png' && uploadFileExt !== '.jpg' && uploadFileExt !== '.gif' && uploadFileExt !== '.jpeg') {
+              return res.status(400).send('Only png, jpg, gif and jpeg are available');
+            }
+        
+            // 保存するファイル名は同じファイル名が生じるケースを考えてDate.now()をつけたす
+            let saveFilename = `${path.basename(uploadFile.name, uploadFileExt)}-${Date.now()}${uploadFileExt}`;
+        
+            // サーバー上の保存位置
+            let uploadPath = path.join(`./public/img/upload_events/${saveFilename}`);
+        
+            console.log(`ファイル名: ${uploadFile.name}`);
+            console.log(`保存パス: ${uploadPath}`);
+        
+            // メモリ上にあるファイルをサーバーパスへ移動させる
+            uploadFile.mv( uploadPath, async(err) => {
+
+                if (err) {
+                return res.status(500).send(err);
+                }
+                // sharpをt使ってリサイズする時のファイル名
+                const resizeURL = `${path.basename(saveFilename, path.extname(saveFilename))}-resize.jpg`;
+
+                sharp(uploadPath).resize(400, 400, {
+                    fit: 'inside'
+                }).toFile(path.join(`./public/img/upload_events/${resizeURL}`), (err, info)=>{
+                    if(err){
+                        throw err 
+                    }
+                    console.log(info);
+                });
+
+                await db.Event.update({
+                    image: resizeURL,
+                }, {
+                    where: { id: newEventId }
+                }).catch(err => {
+                    res.render('layout', { layout_name: 'error', title: 'ERROR', msg: err });
+                })
+
+                res.redirect('/events/')
+            });
+        } catch (err) {
+            console.log(err); next(err);
+        }
+    },
+
 }

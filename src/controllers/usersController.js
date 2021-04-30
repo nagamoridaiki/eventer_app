@@ -126,7 +126,7 @@ module.exports = {
             title: 'マイプロフィール',
             user: oneUser,
             err: null,
-            login: oneUser,
+            login: req.session.user,
         }
         res.render('layout', { layout_name: 'myprof2', data });
     },

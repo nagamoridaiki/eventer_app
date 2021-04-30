@@ -18,7 +18,7 @@ const upload = multer({ storage: storage })
 
 router.get('/', usersController.verifyJWT, eventsController.index);
 router.get('/add', usersController.verifyJWT, eventsController.add);
-router.post('/add', usersController.verifyJWT, upload.single('file'), eventsController.create);
+router.post('/add', usersController.verifyJWT, eventsController.create, eventsController.imageUpload);
 router.get('/show/:id', usersController.verifyJWT, eventsController.show);
 router.get('/edit/:id', usersController.verifyJWT, eventsController.edit);
 router.post('/update/:id', usersController.verifyJWT, eventsController.update, eventsController.tagUpdate);
