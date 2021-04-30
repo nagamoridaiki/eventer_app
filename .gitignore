@@ -5,3 +5,4 @@ src/package-lock.json
 node_modules/
 package-lock.json
 src/public/images/
+src/public/img/

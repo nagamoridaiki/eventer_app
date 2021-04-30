@@ -1,5 +1,6 @@
 const createError = require('http-errors');
 const express = require('express');
+const fileUpload = require('express-fileupload');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
@@ -36,6 +37,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 //app.use(connectFlash());
+app.use(fileUpload());
 
 // body parserの設定
 app.use(bodyParser.urlencoded({ extended: false }));

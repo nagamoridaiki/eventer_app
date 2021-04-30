@@ -130,7 +130,8 @@ module.exports = {
             let findTag = await tagUseCase.findOrCreate(res, tag);
             //タグをイベントと紐付け
             tagUseCase.eventTagCreate(res, newEventData, findTag);
-            res.redirect('/events');
+            req.session.newEvent = newEventData.id
+            next()
         });
     },
     edit: async(req, res, next) => {
@@ -258,6 +259,12 @@ module.exports = {
         res.render('layout', { layout_name: 'events/history2', data });
 
     },
+    imageUpload: async(req, res, next) => {
+        const newEventId = req.session.newEvent
+        await eventUseCase.fileUpload(req, res, next, newEventId);
 
+        req.session.newEvent = null;
+        res.redirect('/events');
+    }
 
 }
