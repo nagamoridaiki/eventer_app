@@ -7,6 +7,7 @@ const logger = require('morgan');
 const bodyParser = require('body-parser');
 const indexRouter = require('./routes/index');
 const eventsRouter = require('./routes/events');
+const articlesRouter = require('./routes/articles');
 const session = require('express-session');
 //const connectFlash = require("connect-flash");
 const layouts = require("express-ejs-layouts");
@@ -45,6 +46,7 @@ app.use(bodyParser.json());
 
 app.use('/', indexRouter);
 app.use('/events', eventsRouter);
+app.use('/articles', articlesRouter);
 
 app.use(express.static(path.join(__dirname, 'public')))
 
