@@ -9,6 +9,7 @@ const articlesController = require('../controllers/articlesController');
 
 router.get('/add', usersController.verifyJWT, articlesController.add);
 router.post('/add', usersController.verifyJWT, articlesController.create);
-
+router.get('/', usersController.verifyJWT, articlesController.index);
+router.post('/like', usersController.verifyJWT, articlesController.like);
 
 module.exports = router;

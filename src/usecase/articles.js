@@ -16,6 +16,18 @@ const path = require('path');
 const sharp = require('sharp');
 
 module.exports = {
+    articleGetAll: async function () {
+        const allArticle = await db.Article.findAll(
+            {
+                include: ['User', 'LikedUser'],
+                order: [
+                    ['id', 'DESC']
+                ],
+            }
+        )
+
+        return allArticle;
+    },
     articleCreate: async function (ArticleId, params) {
         const newArticle = await db.Article.create({
             userId: ArticleId,

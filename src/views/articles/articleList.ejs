@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>
+        <%= data.title %>
+    </title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" crossorigin="anonymous">
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.polyfills.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <h3><%= data.title %></h3>
+
+    <div class="container">
+         
+        <% for(let i in data.content.article) { %>
+        <div class="card">
+            <div class="card-body">
+                <%if (data.content.article[i].image != null) {%>
+                    <img src="/img/uploard_articles/<%= data.content.article[i].image %>" width="100%" height="100%" class="flex-row-reverse"/>
+                <% } %>
+            <h5 class="card-title"><%= data.content.article[i].title %></h5>
+            <p class="card-text"><%= data.content.article[i].detail %></p>
+            <%if (data.content.article[i].User.image != null) {%>
+                <img src="/img/upload_icon/<%= data.content.article[i].User.image %>" width="5%" height="5%" class="flex-row-reverse rounded-circle"/>
+            <% } %>
+            <p class="card-text"><%= data.content.article[i].User.name %></p>
+
+            <%if (data.content.isLike[i] == 'doLike') {%>
+                <form method="post" action="/articles/Like">
+                    いいねされた数
+                    <hr class="mt-0 mb-2">
+                    <div class="tab-content bg-light p-3">
+                        <%= data.content.article[i].LikedUser.length %>
+                    </div>
+                    <input type="hidden" name="userId" value="<%= data.login.id %>">
+                    <input type="hidden" name="articleId" value="<%= data.content.article[i].id %>">
+                    <input class="btn btn-primary" type="submit" value="いいねを外す">
+                </form>
+            <% } %>
+            <%if (data.content.isLike[i] == 'yetLike') {%>
+                <form method="post" action="/articles/Like">
+                    いいねされた数
+                    <hr class="mt-0 mb-2">
+                    <div class="tab-content bg-light p-3">
+                        <%= data.content.article[i].LikedUser.length %>
+                    </div>
+                    <input type="hidden" name="userId" value="<%= data.login.id %>">
+                    <input type="hidden" name="articleId" value="<%= data.content.article[i].id %>">
+                    <input class="btn btn-success" type="submit" value="いいね">
+                </form>
+            <% } %>
+
+            
+
+            </div>
+            <div class="card-footer text-right"><%= data.content.article[i].updatedAt %></div>
+        </div><br>
+        <% } %>
+    </div>
+
+
+</body>
+
+</html>

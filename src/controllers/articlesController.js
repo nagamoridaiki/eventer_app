@@ -15,11 +15,46 @@ const articlesUseCase = require('../usecase/articles')
 const tagUseCase = require('../usecase/tags')
 const userUseCase = require('../usecase/users')
 const joinUseCase = require('../usecase/joins')
+const likeUseCase = require('../usecase/likes')
 const favoriteUseCase = require('../usecase/favorite')
 const Like = require("../models/like")
 const Article = require("../models/article")
 
 module.exports = {
+    index: async(req, res, next) => {
+        //全イベント情報取得
+        const articleAllData = await articlesUseCase.articleGetAll();
+
+        let isLike = [];
+        //あなたはそのイベントに参加予定か？
+        articleAllData.forEach(article => {
+            //その投稿にいいねがあれば
+            if (article.LikedUser[0]) {
+                //ログインしているユーザーがいいねしているかどうかを判定する。
+                if (article.LikedUser[0].id == req.session.user.id) {
+                    isLike.push('doLike')//ログインしているユーザーがいいねしている
+                } else {
+                    isLike.push('yetLike')//ログインユーザーではない他の誰かがいいねしている。
+                }
+            } else {
+                isLike.push('yetLike')//誰もいいねしていない
+            }
+        });
+
+        console.log("isLikeの中身", isLike);
+
+        //res.json(articleAllData)
+        const data = {
+            title: 'Article',
+            login: req.session.user,
+            content: {
+                article: articleAllData,
+                isLike: isLike
+            },
+        }
+        res.render('layout', { layout_name: 'articles/articleList', data });
+
+    },
     add: (req, res, next) => {
         const data = {
             title: 'Articles/Add',
@@ -42,8 +77,18 @@ module.exports = {
             
             req.session.newArticle = newArticleData.id
             //next()
-            res.redirect('/events');
+            res.redirect('/articles');
         });
+    },
+    like: async(req, res, next) => {
+
+        //いいねしているかを判定する。
+        const likeData = await likeUseCase.findOne(req.body);
+
+        //参加表明と参加辞退を切り替える
+        likeData ? await likeUseCase.unlike(res, req.body) : await likeUseCase.like(res, req.body)
+
+        res.redirect('/articles');
     },
 
 
