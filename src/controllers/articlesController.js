@@ -24,6 +24,7 @@ module.exports = {
     index: async(req, res, next) => {
         //全イベント情報取得
         const articleAllData = await articlesUseCase.articleGetAll();
+        //res.json(articleAllData)
 
         let isLike = [];
         //あなたはそのイベントに参加予定か？
@@ -41,11 +42,11 @@ module.exports = {
             }
         });
 
-        console.log("isLikeの中身", isLike);
+        //console.log("articleAllDataの中身", articleAllData[0].Comment[0]);
 
         //res.json(articleAllData)
         const data = {
-            title: 'Article',
+            title: '投稿',
             login: req.session.user,
             content: {
                 article: articleAllData,
@@ -88,6 +89,11 @@ module.exports = {
         //参加表明と参加辞退を切り替える
         likeData ? await likeUseCase.unlike(res, req.body) : await likeUseCase.like(res, req.body)
 
+        res.redirect('/articles');
+    },
+    commentAdd: async(req, res, next) => {
+        //コメント投稿
+        await articlesUseCase.commentAdd(req.session.user.id, req.body);
         res.redirect('/articles');
     },
 

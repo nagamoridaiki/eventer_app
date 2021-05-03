@@ -3,7 +3,7 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class Article extends Model {
+  class Comment extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -13,7 +13,20 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   };
-  Article.init({
+  Comment.init({
+    articleId: {
+      type: DataTypes.INTEGER,
+      validate: {
+          notEmpty: {
+              msg: "投稿対象は必須です。"
+          }
+      },
+      references: {
+        model: 'Article',
+        key: 'id'
+      },
+      onDelete: "CASCADE",
+    },
     userId: {
       type: DataTypes.INTEGER,
       validate: {
@@ -22,11 +35,11 @@ module.exports = (sequelize, DataTypes) => {
           }
       }
     },
-    title: {
+    body: {
       type: DataTypes.STRING,
       validate: {
           notEmpty: {
-              msg: "タイトルは必須です。"
+              msg: "コメント本文は必須です。"
           },
           len: {
               args: [1, 50],
@@ -34,29 +47,15 @@ module.exports = (sequelize, DataTypes) => {
           }
       }
     },
-    image: DataTypes.STRING,
-    detail: DataTypes.STRING
   }, {
     sequelize,
-    modelName: 'Article',
+    modelName: 'Comment',
   });
-  Article.associate = function(models) {
-    Article.belongsToMany(models.User, {
-        through: 'Like',
-        as: 'LikedUser',
-        foreignKey: 'articleId'
-    });
-    Article.belongsToMany(models.Tag, {
-      through: 'ArticleTag',
-      as: 'Tag',
-      foreignKey: 'articleId'
-    });
-    Article.belongsTo(models.User);
-    Article.hasMany(models.Comment, {
-      foreignKey: 'articleId',
-      as: 'Comment',
-    });
+  Comment.associate = function(models) {
+    Comment.belongsTo(models.Article, {foreignKey: 'articleId'});
+    Comment.belongsTo(models.User, {foreignKey: 'userId'});
 
 };
-  return Article;
+
+  return Comment;
 };
