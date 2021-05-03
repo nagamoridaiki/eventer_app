@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>
+        <%= data.title %>
+    </title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" crossorigin="anonymous">
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.polyfills.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+    <br>
+    <br>
+    <h3><%= data.title %></h3>
+
+    <div class="container">
+         
+        <% for(let i in data.content.article) { %>
+        <div class="card">
+            <div class="card-body">
+                <%if (data.content.article[i].image != null) {%>
+                    <img src="/img/uploard_articles/<%= data.content.article[i].image %>" width="100%" height="100%" class="flex-row-reverse"/>
+                <% } %>
+            <h5 class="card-title"><%= data.content.article[i].title %></h5>
+            <p class="card-text"><%= data.content.article[i].detail %></p>
+            <%if (data.content.article[i].User.image != null) {%>
+                <img src="/img/upload_icon/<%= data.content.article[i].User.image %>" width="5%" height="5%" class="flex-row-reverse rounded-circle"/>
+            <% } %>
+            <p class="card-text"><%= data.content.article[i].User.name %></p>
+
+            <%if (data.content.isLike[i] == 'doLike') {%>
+                <form method="post" action="/articles/Like">
+                    いいねされた数
+                    <hr class="mt-0 mb-2">
+                    <div class="tab-content bg-light p-3">
+                        <%= data.content.article[i].LikedUser.length %>
+                    </div>
+                    <input type="hidden" name="userId" value="<%= data.login.id %>">
+                    <input type="hidden" name="articleId" value="<%= data.content.article[i].id %>">
+                    <input class="btn btn-primary" type="submit" value="いいねを外す">
+                </form>
+            <% } %>
+            <%if (data.content.isLike[i] == 'yetLike') {%>
+                <form method="post" action="/articles/Like">
+                    いいねされた数
+                    <hr class="mt-0 mb-2">
+                    <div class="tab-content bg-light p-3">
+                        <%= data.content.article[i].LikedUser.length %>
+                    </div>
+                    <input type="hidden" name="userId" value="<%= data.login.id %>">
+                    <input type="hidden" name="articleId" value="<%= data.content.article[i].id %>">
+                    <input class="btn btn-success" type="submit" value="いいね">
+                </form>
+            <% } %>
+            <br>
+
+            <!-- コメント一覧 -->
+            <% if (data.content.article[i].Comment != null) { %>
+                <% for(let n in data.content.article[i].Comment) { %>
+                <div class="container">
+                    <div class="card">
+                        <div class="card-body">
+                          <h5 class="card-title"><%= data.content.article[i].Comment[n].body %></h5>
+                          <p class="card-text"><%= data.content.article[i].Comment[n].updatedAt %></p>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+            <% } %>
+            <br>
+
+            <!-- コメントする -->
+            <a href="#comment_<%= data.content.article[i].id %>" data-toggle="modal"><p>コメントする</p></a>
+            <div class="modal fade" id="comment_<%= data.content.article[i].id %>" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                  <div class="modal-content">
+                    <div class="modal-body">
+                      <button class="close" data-dismiss="modal"><span>&times;</span></button>
+                        <!-- コメントを書く -->
+                        <form method="post" action="/articles/commentAdd">
+                            <input type="hidden" name="articleId" value="<%= data.content.article[i].id %>">
+                            <div class="form-group mb-4">
+                            <label for="B_address">コメント</label>
+                            <textarea type="text" name="body" class="form-control" rows="5"></textarea>
+                            <ul class="text-danger">
+                                <% if (data.err!=null) { for (let i in data.err.get("body")) { %>
+                                    <li>
+                                        <%= data.err.get("body")[i].message %>
+                                    </li>
+                                <% }} %>
+                            </ul>
+                            <div>
+                                <input type="submit" value="送信" class="btn btn-primary col-2">
+                            </div>
+                        </form>
+                    </div>
+                  </div>
+                </div>
+            </div>
+
+            </div>
+            <div class="card-footer text-right"><%= data.content.article[i].updatedAt %></div>
+        </div><br>
+        <% } %>
+    </div>
+
+<script src="/src/public/javascripts/jquery-3.3.1.slim.min.js"></script>
+<script src="/src/public/javascripts/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

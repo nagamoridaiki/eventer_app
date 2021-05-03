@@ -3,7 +3,7 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class Tag extends Model {
+  class Like extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -13,24 +13,26 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   };
-  Tag.init({
-    name: DataTypes.STRING
+  Like.init({
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+          model: 'User',
+          key: 'id'
+      }
+    },
+    articleId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+          model: 'Article',
+          key: 'id'
+      }
+  }
   }, {
     sequelize,
-    modelName: 'Tag',
+    modelName: 'Like',
   });
-  Tag.associate = function(models) {
-    Tag.belongsToMany(models.Event, {
-        through: 'EventTag',
-        as: 'Event',
-        foreignKey: 'tagId'
-    });
-    Tag.belongsToMany(models.Article, {
-      through: 'ArticleTag',
-      as: 'Article',
-      foreignKey: 'tagId'
-  });
-
-};
-  return Tag;
+  return Like;
 };
