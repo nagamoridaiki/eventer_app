@@ -40,19 +40,20 @@ module.exports = {
             detail: params.detail,
             holdDate: params.holdDate,
             capacity: params.capacity,
-            //image: EventId + "event.jpg",
+            address: params.address,
         }).catch((err) => {
             return err
         });
         return newEvent;
     },
-    eventUpdate: async function (EventId, params){
+    eventUpdate: async function (res, EventId, params){
         await db.Event.update({
             title: params.title,
             subTitle: params.subTitle,
             detail: params.detail,
             holdDate: params.holdDate,
             capacity: params.capacity,
+            address: params.address,
         }, {
             where: { id: EventId, }
         }).catch((err) => {
