@@ -50,7 +50,8 @@ module.exports = (sequelize, DataTypes) => {
         },
         holdDate: DataTypes.DATE,
         isPrivate: DataTypes.BOOLEAN,
-        capacity: DataTypes.INTEGER
+        capacity: DataTypes.INTEGER,
+        address: DataTypes.STRING,
     }, {
         sequelize,
         modelName: 'Event',

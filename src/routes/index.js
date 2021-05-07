@@ -17,6 +17,7 @@ const storage = multer.diskStorage({
 })
 const upload = multer({ storage: storage })
 
+
 router.get('/login', usersController.login);
 router.get('/register', usersController.register);
 router.post('/create', usersController.create, usersController.indexView);
@@ -38,5 +39,8 @@ router.post('/upload', usersController.verifyJWT, usersController.imageUpload);
 router.get('/add', usersController.verifyJWT, eventsController.add);
 
 //router.post('/add', usersController.verifyJWT, eventsController.create);
+
+router.get('/map', usersController.map);
+
 
 module.exports = router;

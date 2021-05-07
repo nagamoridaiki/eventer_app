@@ -153,6 +153,13 @@ module.exports = {
         
         res.redirect('/user/' + req.session.user.id)
     },
+    map: (req, res, next) => {
+        const data = {
+            title: 'login',
+            login: null
+        }
+        res.render('layout', { layout_name: 'map', data });
+    }
     
 
 

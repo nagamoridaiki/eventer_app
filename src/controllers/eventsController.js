@@ -152,7 +152,7 @@ module.exports = {
     update: async(req, res, next) => {
         const EventId = req.params.id;
         //イベント情報のアップデート
-        await eventUseCase.eventUpdate(EventId, req.body);
+        await eventUseCase.eventUpdate(res, EventId, req.body);
         next();
     },
     tagUpdate: async(req, res, next) => {
