@@ -9,6 +9,18 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" crossorigin="anonymous">
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <link rel='stylesheet' href='/stylesheets/bootstrap.min.css' />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,
+    initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Google Maps</title>
+    <style>
+    #map {
+        height: 100%;
+    }
+    </style> 
+    </head>
+
 </head>
 
 
@@ -58,6 +70,12 @@
             <div class="tab-content bg-light p-3">
                 <%= data.event.UserFavorite.length %>
             </div>
+            会場
+            <hr class="mt-0 mb-2">
+            <div class="tab-content bg-light p-3" id="address" value="いいい">
+                <%= data.event.address %>
+            </div>
+            <div id="map"></div> 
         </div>
     </div>
 
@@ -93,11 +111,43 @@
             <input class="btn btn-success" type="submit" value="お気に入りに登録する">
         </form>
     <% } %>
-
-        
-
-<script src="/javascripts/jquery-3.3.1.slim.min.js"></script>
-<script src="/src/public/javascripts/bootstrap.bundle.min.js"></script>
-<script src="/src/public/javascripts/jquery-3.3.1.slim.min.js"></script>
 </body>
+
+<script> 
+    const googleMapApiKey = require('../../config/googleMapApiKey');
+
+    console.log(googleMapApiKey)
+
+    function initMap() { 
+        let latNumber;
+        let lngNumber;
+        const addressId = document.getElementById('address').textContent
+        const address = addressId;
+        const url = 
+        "https://maps.googleapis.com/maps/api/geocode/json?language=ja&address=" + 
+        address + 
+        "&key=XXXXXXXXXXXXXXXXXXXXX&callback=initMap";
+
+        fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            latNumber = data.results[0].geometry.location.lat;
+            lngNumber = data.results[0].geometry.location.lng;
+        })
+        .then( () => {
+            let map = new google.maps.Map(document.getElementById('map'), { 
+            center: { lat: latNumber, lng: lngNumber }, 
+            zoom: 17 
+            })
+            let marker = new google.maps.Marker({ 
+                    position: { lat: latNumber, lng: lngNumber }, 
+                    map: map 
+            })
+        })
+    }
+</script>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA2eshEBYGQRhIIXTvkJBlZeTlrVaw5Kb4&callback=initMap" 
+async defer></script>
+
 </html>
