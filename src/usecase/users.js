@@ -140,6 +140,38 @@ module.exports = {
             console.log(err); next(err);
         }
     },
+    findFollowee: async function (res, oneUser, loginUserId) {
+        let alwaysFollow = false;
+        let followee =  oneUser.followee;
+        
+        for (let i = 0 ; i < followee.length ; i++) {
+            if (followee[i].id == loginUserId) {
+                alwaysFollow = true
+                break
+            }
+        }
+        return alwaysFollow
+    },
+    attachFollow: async function (res, followId, loginUserId) {
+        await db.Follow.create({
+            follower: loginUserId,
+            followee: followId,
+        }).catch(err => {
+            res.render('layout', { layout_name: 'error', title: 'ERROR', msg: err });
+        });
+        return true
+    },
+    detachFollow: async function (res, followId, loginUserId) {
+        await db.Follow.destroy({
+            where: { 
+                follower: loginUserId,
+                followee: followId, 
+            }
+        }).catch(err => {
+            res.render('layout', { layout_name: 'error', title: 'ERROR', msg: err });
+        });
+        return true
+    },
 
 
 

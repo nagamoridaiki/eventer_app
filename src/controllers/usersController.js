@@ -123,14 +123,7 @@ module.exports = {
         const oneUser = await userUseCase.findOneUser(res, UserId);
 
         //ログインユーザーがそのユーザーをフォローしているか
-        let follow_flg = false
-        let followee = oneUser.followee
-        for (let i = 0 ; i < followee.length ; i++) {
-            if (followee[i].id == req.session.user.id) {
-                follow_flg = true//フォローしている
-                break
-            }
-        }
+        let follow_flg = await userUseCase.findFollowee(res, oneUser, req.session.user.id);
 
         //取得したuser情報をもとに画面にレンダリング
         const data = {
@@ -164,6 +157,19 @@ module.exports = {
         await userUseCase.fileUpload(req, res, next);
         
         res.redirect('/user/' + req.session.user.id)
+    },
+    follow: async(req, res, next) => {
+        const followId = req.params.id;
+        const findUser = await userUseCase.findOneUser(res, followId);
+        //ログインユーザーがそのユーザーをフォローしているか
+        let alwaysFollow = await userUseCase.findFollowee(res, findUser, req.session.user.id);
+        //もしすでにフォローしている（true）なら、フォローをはずす。falseならフォローをつける
+        if (alwaysFollow) {
+            await userUseCase.detachFollow(res, followId, req.session.user.id);
+        } else {
+            await userUseCase.attachFollow(res, followId, req.session.user.id)
+        }
+        res.redirect('/user/'+ followId)
     },
 
 

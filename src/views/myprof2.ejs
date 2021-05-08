@@ -31,9 +31,9 @@
                         <!-- フォロー -->
                         <% if (data.user.id != data.login.id) {%>
                             <% if (data.follow_flg == false) {%>
-                            <a href="/user/<%= data.user.id %>/edit">フォロー</a>
+                            <a href="/user/<%= data.user.id %>/follow">フォロー</a>
                             <% } else { %>
-                            <a href="/user/<%= data.user.id %>/edit">フォローをはずす</a>
+                            <a href="/user/<%= data.user.id %>/follow">フォローをはずす</a>
                             <% } %>
                         <% } %>
     
