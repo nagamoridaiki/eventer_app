@@ -24,27 +24,22 @@ module.exports = {
     index: async(req, res, next) => {
         //全イベント情報取得
         const articleAllData = await articlesUseCase.articleGetAll();
-        //res.json(articleAllData)
 
         let isLike = [];
-        //あなたはそのイベントに参加予定か？
-        articleAllData.forEach(article => {
-            //その投稿にいいねがあれば
-            if (article.LikedUser[0]) {
+        //投稿１つあたり
+        for (let n = 0 ; n < articleAllData.length ; n++) {
+            let likeUsers = articleAllData[n].LikedUser
+            isLike[n] = 'yetLike'
+            //いいねしたユーザー1人ごとにあたり
+            for (let i = 0 ; i < likeUsers.length ; i++) {
                 //ログインしているユーザーがいいねしているかどうかを判定する。
-                if (article.LikedUser[0].id == req.session.user.id) {
-                    isLike.push('doLike')//ログインしているユーザーがいいねしている
-                } else {
-                    isLike.push('yetLike')//ログインユーザーではない他の誰かがいいねしている。
+                if (likeUsers[i].id == req.session.user.id) {
+                    isLike[n] = 'doLike'
+                    break
                 }
-            } else {
-                isLike.push('yetLike')//誰もいいねしていない
             }
-        });
+        }
 
-        //console.log("articleAllDataの中身", articleAllData[0].Comment[0]);
-
-        //res.json(articleAllData)
         const data = {
             title: '投稿',
             login: req.session.user,
@@ -67,19 +62,8 @@ module.exports = {
     create: async(req, res, next) => {
         //投稿作成
         const newArticleData = await articlesUseCase.articleCreate(req.session.user.id, req.body);
-        //タグ作成およびイベントとの紐付け
-        let tags = JSON.parse(req.body.tags);
-        //tagの数だけ繰り返す
-        tags.forEach(async function(tag, key ) {
-            //入力したタグをDBから探し、なければ作成する。
-            let findTag = await tagUseCase.findOrCreate(res, tag);
-            //タグをイベントと紐付け
-            tagUseCase.articleTagCreate(res, newArticleData, findTag)
-            
-            req.session.newArticle = newArticleData.id
-            //next()
-            res.redirect('/articles');
-        });
+        req.session.newArticle = newArticleData.id
+        next()
     },
     like: async(req, res, next) => {
 
@@ -96,6 +80,14 @@ module.exports = {
         await articlesUseCase.commentAdd(req.session.user.id, req.body);
         res.redirect('/articles');
     },
+    imageUpload: async(req, res, next) => {
+        const newArticleId = req.session.newArticle
+        await articlesUseCase.fileUpload(req, res, next, newArticleId);
+
+        req.session.newArticle = null;
+        res.redirect('/articles');
+    }
+
 
 
 

@@ -22,60 +22,47 @@
          
         <% for(let i in data.content.article) { %>
         <div class="card">
-            <div class="card-body">
-                <%if (data.content.article[i].image != null) {%>
-                    <img src="/img/uploard_articles/<%= data.content.article[i].image %>" width="100%" height="100%" class="flex-row-reverse"/>
-                <% } %>
-            <h5 class="card-title"><%= data.content.article[i].title %></h5>
-            <p class="card-text"><%= data.content.article[i].detail %></p>
+            <div class="card-body"> 
+            <div style="float:right"><%= data.content.article[i].updatedAt %></div>          
             <%if (data.content.article[i].User.image != null) {%>
                 <img src="/img/upload_icon/<%= data.content.article[i].User.image %>" width="5%" height="5%" class="flex-row-reverse rounded-circle"/>
+            <% } else { %>
+                <img src="/img/upload_icon/noperson.jpg" width="5%" height="5%" class="flex-row-reverse rounded-circle"/>
             <% } %>
             <p class="card-text"><%= data.content.article[i].User.name %></p>
-
+            <p class="card-text"><%= data.content.article[i].detail %></p>
+            <%if (data.content.article[i].image != null) {%>
+                <img src="/img/uploard_articles/<%= data.content.article[i].image %>" width="30%" height="30%" class="flex-row-reverse"/>
+            <% } %>
+            <br>
             <%if (data.content.isLike[i] == 'doLike') {%>
                 <form method="post" action="/articles/Like">
-                    いいねされた数
-                    <hr class="mt-0 mb-2">
-                    <div class="tab-content bg-light p-3">
-                        <%= data.content.article[i].LikedUser.length %>
-                    </div>
                     <input type="hidden" name="userId" value="<%= data.login.id %>">
                     <input type="hidden" name="articleId" value="<%= data.content.article[i].id %>">
                     <input class="btn btn-primary" type="submit" value="いいねを外す">
+                    <%= data.content.article[i].LikedUser.length %>
                 </form>
             <% } %>
             <%if (data.content.isLike[i] == 'yetLike') {%>
                 <form method="post" action="/articles/Like">
-                    いいねされた数
-                    <hr class="mt-0 mb-2">
-                    <div class="tab-content bg-light p-3">
-                        <%= data.content.article[i].LikedUser.length %>
-                    </div>
                     <input type="hidden" name="userId" value="<%= data.login.id %>">
                     <input type="hidden" name="articleId" value="<%= data.content.article[i].id %>">
                     <input class="btn btn-success" type="submit" value="いいね">
+                    <%= data.content.article[i].LikedUser.length %>
                 </form>
             <% } %>
+            <!-- コメントする -->
+            <a href="#comment_<%= data.content.article[i].id %>" data-toggle="modal">コメントする</a><span>　<%= data.content.article[i].Comment.length %>件</span>
             <br>
-
+            <br>
             <!-- コメント一覧 -->
             <% if (data.content.article[i].Comment != null) { %>
                 <% for(let n in data.content.article[i].Comment) { %>
-                <div class="container">
-                    <div class="card">
-                        <div class="card-body">
-                          <h5 class="card-title"><%= data.content.article[i].Comment[n].body %></h5>
-                          <p class="card-text"><%= data.content.article[i].Comment[n].updatedAt %></p>
-                        </div>
-                    </div>
-                </div>
+                    <h6 class="card-title"><%= data.content.article[i].Comment[n].body %></h6>
+                    <p class="card-text"><%= data.content.article[i].Comment[n].updatedAt %></p>
                 <% } %>
             <% } %>
-            <br>
-
-            <!-- コメントする -->
-            <a href="#comment_<%= data.content.article[i].id %>" data-toggle="modal"><p>コメントする</p></a>
+            
             <div class="modal fade" id="comment_<%= data.content.article[i].id %>" tabindex="-1">
                 <div class="modal-dialog modal-dialog-centered modal-lg">
                   <div class="modal-content">
@@ -104,7 +91,6 @@
             </div>
 
             </div>
-            <div class="card-footer text-right"><%= data.content.article[i].updatedAt %></div>
         </div><br>
         <% } %>
     </div>
