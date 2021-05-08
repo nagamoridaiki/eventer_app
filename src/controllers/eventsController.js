@@ -26,27 +26,16 @@ module.exports = {
         const tagAllData = await tagUseCase.tagGetAll();
 
         let holdDate = [];
-        let favoriteLengthList = {};
         eventAllData.forEach(function(oneEventData, key ) {
             //開催日時情報
             holdDate.push(eventUseCase.getHoldDate(oneEventData));
-            //各イベントにお気に入りがつけられた数
-            let favoriteLength = eventUseCase.getFavoriteLength(oneEventData)
-            favoriteLengthList[oneEventData.id] = favoriteLength//イベントのid : お気に入りの数
         });
-        let eventList = Object.keys(favoriteLengthList);
 
-        //お気に入りが一番ついているイベントのidを取得する。
-        //let favoriteEventList = eventUseCase.forGetMaxFavarite(eventList, favoriteLengthList);
-
-        let maxFavoriteEventId = eventUseCase.getMaxFavarite(eventList, favoriteLengthList)
-        const maxFavoriteEvent = await eventUseCase.findOneEvent(maxFavoriteEventId);
-
-        //2番目を取得する。
-        eventList.pop(maxFavoriteEventId)
-        let secondFavoriteEventId = eventUseCase.getMaxFavarite(eventList, favoriteLengthList)
-        const secondFavoriteEvent = await eventUseCase.findOneEvent(secondFavoriteEventId);
-
+        //お気に入りが数多く付けられている順番でイベントのidを取得する。
+        let maxFavoriteEventId = await eventUseCase.eachEventFavoriteLength(eventAllData)
+        
+        const mostFavoriteEvent = await eventUseCase.findOneEvent(maxFavoriteEventId[0]);
+        const secondFavoriteEvent = await eventUseCase.findOneEvent(maxFavoriteEventId[1]);
 
         const data = {
             title: 'Event',
@@ -56,7 +45,7 @@ module.exports = {
                 holdDate: holdDate,
             },
             Tags: tagAllData,
-            maxFavoriteEvent: maxFavoriteEvent,
+            maxFavoriteEvent: mostFavoriteEvent,
             secondFavoriteEvent: secondFavoriteEvent,
         }
         res.render('layout', { layout_name: 'events/list2', data });
