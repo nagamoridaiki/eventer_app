@@ -49,6 +49,7 @@ module.exports = {
             name: params.name,
             password: params.password,
             email: params.email,
+            selfIntroduction: params.selfIntroduction,
         }).catch(err => {
             res.render('layout', { layout_name: 'error', title: 'ERROR', msg: err });
         });
@@ -65,6 +66,7 @@ module.exports = {
     userUpdate: async function (res, params) {
         const updatedUser = await db.User.update({
             name: params.name,
+            selfIntroduction: params.selfIntroduction,
             password: params.password,
             email: params.email,
         },{
