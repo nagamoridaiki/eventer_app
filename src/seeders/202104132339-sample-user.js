@@ -29,6 +29,20 @@ module.exports = {
                 email: 'sachiko@happy.jp',
                 createdAt: new Date(),
                 updatedAt: new Date()
+            },
+            {
+                name: 'Saburo',
+                password: 'Saburo',
+                email: 'Saburo@saburo.jp',
+                createdAt: new Date(),
+                updatedAt: new Date()
+            },
+            {
+                name: 'Siro',
+                password: 'Siro',
+                email: 'Siro@siro.jp',
+                createdAt: new Date(),
+                updatedAt: new Date()
             }
         ]);
     },
