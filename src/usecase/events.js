@@ -81,26 +81,31 @@ module.exports = {
         };
         return holdDate;
     },
-    getFavoriteLength: function (oneEvent){
-        let FavoriteLength = oneEvent.UserFavorite.length;
-        return FavoriteLength;
-    },
-    //お気に入りが一番ついているイベントのidを取得する。
-    getMaxFavarite: function (allEventId, favoriteLengthList){
-        let FavoriteCount = 0
-        let maxEventId
-        for( let i = 0; i < allEventId.length; i++ ) {
-            //一番大きい要素のみが最後にFavoriteCountに渡されるようにする。
-            let oneEventId = allEventId[i]
-            if (i == 0) {
-                maxEventId = oneEventId;
-            }
-            if (FavoriteCount < favoriteLengthList[oneEventId]){
-                FavoriteCount = favoriteLengthList[oneEventId]
-                maxEventId = oneEventId
-            }
-        }
-        return maxEventId
+    eachEventFavoriteLength: function (eventAllData) {
+        let favoriteLengthList = {};
+
+        if (eventAllData.length == 0) return false;
+
+        eventAllData.forEach(function(oneEventData, key ) {
+            //各イベントにお気に入りがつけられた数
+            let favoriteLength = oneEventData.UserFavorite.length
+            favoriteLengthList[oneEventData.id] = favoriteLength//イベントのid : お気に入りの数
+        });
+        let allEventId = Object.keys(favoriteLengthList);
+
+        let favoriteEventList = []
+        //一番お気に入りがつけられているイベントのidを取得
+        let mostFavoritedEventId = favariteLengthCount(allEventId, favoriteLengthList)
+
+        favoriteEventList.push(mostFavoritedEventId)
+
+        //二番目にお気に入りがつけられているイベントのidを取得
+        allEventId.pop(mostFavoritedEventId)
+        let secondFavoritedEventId = favariteLengthCount(allEventId, favoriteLengthList)
+
+        favoriteEventList.push(secondFavoritedEventId)
+
+        return favoriteEventList
     },
     fileUpload: async function (req, res, next, newEventId) {
         try {
@@ -165,4 +170,21 @@ module.exports = {
         }
     },
 
+}
+
+function favariteLengthCount (allEventId, favoriteLengthList) {
+    let FavoriteCount = 0
+    let mostFavoritedEventId
+    for( let i = 0; i < allEventId.length; i++ ) {
+        //一番大きい要素のみが最後にFavoriteCountに渡されるようにする。
+        let oneEventId = allEventId[i]
+        if (i == 0) {
+            mostFavoritedEventId = oneEventId;
+        }
+        if (FavoriteCount < favoriteLengthList[oneEventId]){
+            FavoriteCount = favoriteLengthList[oneEventId]
+            mostFavoritedEventId = oneEventId
+        }
+    }
+    return mostFavoritedEventId
 }
