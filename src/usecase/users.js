@@ -5,6 +5,7 @@ const Event = require("../models/event")
 const Join = require("../models/join")
 const Tag = require("../models/tag")
 const EventTag = require("../models/eventtag")
+const Follow = require("../models/follow")
 const jsonWebToken = require('jsonwebtoken')
 const db = require('../models/index')
 const httpStatus = require('http-status');
@@ -19,7 +20,7 @@ module.exports = {
             where: {
                 id: userId
             },
-            include: ['Event', 'FavoriteEvent'],
+            include: ['Event', 'FavoriteEvent', 'follower', 'followee'],
         }).catch(err => {
             res.render('layout', { layout_name: 'error', title: 'ERROR', msg: err });
         });

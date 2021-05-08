@@ -32,15 +32,12 @@ router.get('/user/:id', usersController.verifyJWT, usersController.myProf);
 router.get('/user/:id/edit', usersController.verifyJWT, usersController.Edit);
 router.post('/user/:id/update', usersController.verifyJWT, usersController.update);
 
-//router.post('/image', usersController.verifyJWT, upload.single('file'), usersController.imageUpload)
 
 router.post('/upload', usersController.verifyJWT, usersController.imageUpload);
 
 router.get('/add', usersController.verifyJWT, eventsController.add);
 
-//router.post('/add', usersController.verifyJWT, eventsController.create);
 
-router.get('/map', usersController.map);
 
 
 module.exports = router;
