@@ -22,18 +22,6 @@ module.exports = (sequelize, DataTypes) => {
           }
       }
     },
-    title: {
-      type: DataTypes.STRING,
-      validate: {
-          notEmpty: {
-              msg: "タイトルは必須です。"
-          },
-          len: {
-              args: [1, 50],
-              msg: "1〜50字以内で入力してください"
-          }
-      }
-    },
     image: DataTypes.STRING,
     detail: DataTypes.STRING
   }, {
@@ -45,11 +33,6 @@ module.exports = (sequelize, DataTypes) => {
         through: 'Like',
         as: 'LikedUser',
         foreignKey: 'articleId'
-    });
-    Article.belongsToMany(models.Tag, {
-      through: 'ArticleTag',
-      as: 'Tag',
-      foreignKey: 'articleId'
     });
     Article.belongsTo(models.User);
     Article.hasMany(models.Comment, {

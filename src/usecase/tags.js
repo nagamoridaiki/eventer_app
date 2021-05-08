@@ -6,7 +6,6 @@ const Article = require("../models/article")
 const Join = require("../models/join")
 const Tag = require("../models/tag")
 const EventTag = require("../models/eventtag")
-const ArticleTag = require("../models/articletag")
 const jsonWebToken = require('jsonwebtoken')
 const db = require('../models/index')
 const httpStatus = require('http-status');
@@ -35,16 +34,6 @@ module.exports = {
             res.render('layout', { layout_name: 'error', title: 'ERROR', msg: err });
         })
     },
-    articleTagCreate: async function (res, newArticleData, tag) {
-        //イベントとの紐付け
-        await db.ArticleTag.create({
-            artileId: newArticleData.id,
-            tagId: tag[0].id,
-        }).catch((err) => {
-            res.render('layout', { layout_name: 'error', title: 'ERROR', msg: err });
-        })
-    },
-
     eventTagDestroy: async function (res, EventId) {
         //イベントとの紐付け
         await db.EventTag.destroy({
