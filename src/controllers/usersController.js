@@ -121,10 +121,15 @@ module.exports = {
         //userIdを引き取る
         const UserId = req.params.id;
         const oneUser = await userUseCase.findOneUser(res, UserId);
+
+        //ログインユーザーがそのユーザーをフォローしているか
+        let follow_flg = await userUseCase.findFollowee(res, oneUser, req.session.user.id);
+
         //取得したuser情報をもとに画面にレンダリング
         const data = {
             title: 'マイプロフィール',
             user: oneUser,
+            follow_flg: follow_flg,
             err: null,
             login: req.session.user,
         }
@@ -139,7 +144,7 @@ module.exports = {
             title: 'プロフィール編集',
             user: oneUser,
             err: null,
-            login: oneUser,
+            login: req.session.user,
         }
         res.render('layout', { layout_name: 'myprofEdit', data });
     },
@@ -153,14 +158,19 @@ module.exports = {
         
         res.redirect('/user/' + req.session.user.id)
     },
-    map: (req, res, next) => {
-        const data = {
-            title: 'login',
-            login: null
+    follow: async(req, res, next) => {
+        const followId = req.params.id;
+        const findUser = await userUseCase.findOneUser(res, followId);
+        //ログインユーザーがそのユーザーをフォローしているか
+        let alwaysFollow = await userUseCase.findFollowee(res, findUser, req.session.user.id);
+        //もしすでにフォローしている（true）なら、フォローをはずす。falseならフォローをつける
+        if (alwaysFollow) {
+            await userUseCase.detachFollow(res, followId, req.session.user.id);
+        } else {
+            await userUseCase.attachFollow(res, followId, req.session.user.id)
         }
-        res.render('layout', { layout_name: 'map', data });
-    }
-    
+        res.redirect('/user/'+ followId)
+    },
 
 
 

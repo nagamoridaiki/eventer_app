@@ -5,6 +5,7 @@ const Event = require("../models/event")
 const Join = require("../models/join")
 const Tag = require("../models/tag")
 const EventTag = require("../models/eventtag")
+const Follow = require("../models/follow")
 const jsonWebToken = require('jsonwebtoken')
 const db = require('../models/index')
 const httpStatus = require('http-status');
@@ -19,7 +20,7 @@ module.exports = {
             where: {
                 id: userId
             },
-            include: ['Event', 'FavoriteEvent'],
+            include: ['Event', 'FavoriteEvent', 'follower', 'followee'],
         }).catch(err => {
             res.render('layout', { layout_name: 'error', title: 'ERROR', msg: err });
         });
@@ -49,6 +50,7 @@ module.exports = {
             name: params.name,
             password: params.password,
             email: params.email,
+            selfIntroduction: params.selfIntroduction,
         }).catch(err => {
             res.render('layout', { layout_name: 'error', title: 'ERROR', msg: err });
         });
@@ -65,6 +67,7 @@ module.exports = {
     userUpdate: async function (res, params) {
         const updatedUser = await db.User.update({
             name: params.name,
+            selfIntroduction: params.selfIntroduction,
             password: params.password,
             email: params.email,
         },{
@@ -136,6 +139,38 @@ module.exports = {
         } catch (err) {
             console.log(err); next(err);
         }
+    },
+    findFollowee: async function (res, oneUser, loginUserId) {
+        let alwaysFollow = false;
+        let followee =  oneUser.followee;
+        
+        for (let i = 0 ; i < followee.length ; i++) {
+            if (followee[i].id == loginUserId) {
+                alwaysFollow = true
+                break
+            }
+        }
+        return alwaysFollow
+    },
+    attachFollow: async function (res, followId, loginUserId) {
+        await db.Follow.create({
+            follower: loginUserId,
+            followee: followId,
+        }).catch(err => {
+            res.render('layout', { layout_name: 'error', title: 'ERROR', msg: err });
+        });
+        return true
+    },
+    detachFollow: async function (res, followId, loginUserId) {
+        await db.Follow.destroy({
+            where: { 
+                follower: loginUserId,
+                followee: followId, 
+            }
+        }).catch(err => {
+            res.render('layout', { layout_name: 'error', title: 'ERROR', msg: err });
+        });
+        return true
     },
 
 
