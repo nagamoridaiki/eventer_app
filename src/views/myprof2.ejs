@@ -23,20 +23,27 @@
                         <% } %>
                     </div>
                     <div class="col-7">
-                        <!-- 編集する -->
-                        <% if (data.user.id == data.login.id) {%>
-                        <a href="/user/<%= data.user.id %>/edit">編集する</a>
-                        <% } %>
-
-                        <!-- フォロー -->
-                        <% if (data.user.id != data.login.id) {%>
-                            <% if (data.follow_flg == false) {%>
-                            <a href="/user/<%= data.user.id %>/follow">フォロー</a>
-                            <% } else { %>
-                            <a href="/user/<%= data.user.id %>/follow">フォローをはずす</a>
-                            <% } %>
-                        <% } %>
-    
+                        <div class="row">
+                            <div class="col-3">
+                                <!-- 編集する -->
+                                <% if (data.user.id == data.login.id) {%>
+                                <a href="/user/<%= data.user.id %>/edit">編集する</a>
+                                <% } %>
+                            
+                                <!-- フォロー -->
+                                <% if (data.user.id != data.login.id) {%>
+                                <% if (data.follow_flg == false) {%>
+                                <a href="/user/<%= data.user.id %>/follow">フォロー</a>
+                                <% } else { %>
+                                <a href="/user/<%= data.user.id %>/follow">フォローをはずす</a>
+                                <% } %>
+                                <% } %>
+                            </div>
+                            <div class="col-3">
+                                <a href="#message_<%= data.user.id %>" data-toggle="modal">DMする</a>
+                            </div>
+                        </div>
+                        
                         <div class="card-body">
                             名前
                             <hr class="mt-0 mb-2">
@@ -87,6 +94,63 @@
                                     </tbody>
                                 </table>
                             </div>
+
+                            <div class="modal fade" id="message_<%= data.user.id %>" tabindex="-1">
+                                <div class="modal-dialog modal-dialog-centered modal-lg">
+                                  <div class="modal-content">
+                                    <div class="modal-body">
+                                      <button class="close" data-dismiss="modal"><span>&times;</span></button>
+                                        <!-- メッセージ一覧 -->
+                                        <div class="row">
+                                            <div class="col-12">
+                                            <% for(let i in data.messagesList) { %>
+                                                <!-- 自分が送る側 -->
+                                                <% if (data.messagesList[i].sendUserId == data.login.id) {%>
+                                                <div style="float: right;">
+                                                    <h7 class="card-title"><%= data.messagesList[i].content %>
+                                                        <% if (data.login.image) {%>
+                                                            <img src="/img/upload_icon/<%= data.login.image %>" width="5%" height="5%" class="flex-row-reverse rounded-circle"/>
+                                                        <% } else { %>
+                                                            <img src="/img/upload_icon/noperson.jpg" width="5%" height="5%" class="flex-row-reverse rounded-circle"/>
+                                                        <% } %>                            
+                                                    </h7><br>
+                                                    <div class="card-text"><%= data.messagesList[i].updatedAt %></div>
+                                                    <div style="margin-left: 22rem;"><%= data.login.name %></div>
+                                                </div>
+                                                <!-- 相手が送る側 -->
+                                                <% } else { %>
+                                                <div style="float: left;">
+                                                    <% if (data.user.image) {%>
+                                                        <img src="/img/upload_icon/<%= data.user.image %>" width="5%" height="5%" class="flex-row-reverse rounded-circle"/>
+                                                    <% } else { %>
+                                                        <img src="/img/upload_icon/noperson.jpg" width="5%" height="5%" class="flex-row-reverse rounded-circle"/>
+                                                    <% } %>                            
+                                                    <h7 class="card-title"><%= data.messagesList[i].content %></h7><br>
+                                                    <div class="card-text"><%= data.messagesList[i].updatedAt %></div>
+                                                    <div style="float: left;"><%= data.user.name %></div>
+                                                </div>
+                                                <% } %>
+                                                
+                                            <% } %>
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <!-- DMを書く -->
+                                        <form method="post" action="/articles/messageSend">
+                                            <input type="hidden" name="sendUserId" value="<%= data.login.id %>">
+                                            <input type="hidden" name="receiveUserId" value="<%= data.user.id %>">
+                                            <div class="form-group mb-4">
+                                            <label for="B_address">メッセージを書く</label>
+                                            <textarea type="text" name="content" class="form-control" rows="4"></textarea>
+                                            <div>
+                                                <input type="submit" value="送信" class="btn btn-primary col-2">
+                                            </div>
+                                        </form>
+                                    </div>
+                                  </div>
+                                </div>
+                            </div>
+    
 
 
                         </div>

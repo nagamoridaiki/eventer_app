@@ -8,6 +8,7 @@ const Like = require("../models/like")
 const Tag = require("../models/tag")
 const Comment = require("../models/comment")
 const EventTag = require("../models/eventtag")
+const Message = require("../models/message")
 const jsonWebToken = require('jsonwebtoken')
 const db = require('../models/index')
 const httpStatus = require('http-status');
@@ -109,6 +110,16 @@ module.exports = {
         } catch (err) {
             console.log(err); next(err);
         }
+    },
+    messageSend: async function (params) {
+        const sendedMessage = await db.Message.create({
+            sendUserId: params.sendUserId,
+            receiveUserId: params.receiveUserId,
+            content: params.content,
+        }).catch((err) => {
+            return err
+        });
+        return sendedMessage;
     },
 
 }

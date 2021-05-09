@@ -125,6 +125,12 @@ module.exports = {
         //ログインユーザーがそのユーザーをフォローしているか
         let follow_flg = await userUseCase.findFollowee(res, oneUser, req.session.user.id);
 
+        //そのユーザーとのDM履歴取得
+        let messagesList = await userUseCase.getAllMessages(res, UserId, req.session.user.id);
+        //res.json(messagesHistory)
+
+
+        
         //取得したuser情報をもとに画面にレンダリング
         const data = {
             title: 'マイプロフィール',
@@ -132,6 +138,7 @@ module.exports = {
             follow_flg: follow_flg,
             err: null,
             login: req.session.user,
+            messagesList: messagesList,
         }
         res.render('layout', { layout_name: 'myprof2', data });
     },
