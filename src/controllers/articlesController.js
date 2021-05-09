@@ -19,6 +19,7 @@ const likeUseCase = require('../usecase/likes')
 const favoriteUseCase = require('../usecase/favorite')
 const Like = require("../models/like")
 const Article = require("../models/article")
+const Message = require("../models/message")
 
 module.exports = {
     index: async(req, res, next) => {
@@ -86,7 +87,11 @@ module.exports = {
 
         req.session.newArticle = null;
         res.redirect('/articles');
-    }
+    },
+    messageSend: async(req, res, next) => {
+        await articlesUseCase.messageSend(req.body)
+        res.redirect('/user/'+req.body.receiveUserId);
+    },
 
 
 

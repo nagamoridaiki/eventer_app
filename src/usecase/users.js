@@ -6,6 +6,7 @@ const Join = require("../models/join")
 const Tag = require("../models/tag")
 const EventTag = require("../models/eventtag")
 const Follow = require("../models/follow")
+const Message = require("../models/message")
 const jsonWebToken = require('jsonwebtoken')
 const db = require('../models/index')
 const httpStatus = require('http-status');
@@ -13,6 +14,7 @@ const process = require('../config/process.js');
 const moment = require('moment')
 const path = require('path');
 const sharp = require('sharp');
+const { Op } = require("sequelize");
 
 module.exports = {
     findOneUser: async function (res, userId) {
@@ -171,6 +173,28 @@ module.exports = {
             res.render('layout', { layout_name: 'error', title: 'ERROR', msg: err });
         });
         return true
+    },
+    getAllMessages: async function (res, purposeUserId, MyLoginId) {
+        //送信元がログインユーザー、送信先が見ている相手先または
+        //送信元が見ている相手先、送信先がログインユーザーのDMを全て取得する
+        let allMessages = await db.Message.findAll({
+            where: {
+                [Op.or]: [
+                    {
+                        sendUserId: purposeUserId,
+                        receiveUserId: MyLoginId
+                    },
+                    {
+                        sendUserId: MyLoginId,
+                        receiveUserId: purposeUserId
+                    }
+                ]
+            },
+            order: [
+                ['updatedAt', 'ASC']
+            ],
+        });
+        return allMessages;
     },
 
 

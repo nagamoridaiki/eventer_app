@@ -12,6 +12,6 @@ router.post('/add', usersController.verifyJWT, articlesController.create, articl
 router.get('/', usersController.verifyJWT, articlesController.index);
 router.post('/like', usersController.verifyJWT, articlesController.like);
 router.post('/commentAdd', usersController.verifyJWT, articlesController.commentAdd);
-
+router.post('/messageSend', usersController.verifyJWT, articlesController.messageSend);
 
 module.exports = router;
