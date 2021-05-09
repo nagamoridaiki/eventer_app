@@ -58,7 +58,12 @@
             主催
             <hr class="mt-0 mb-2">
             <div class="tab-content bg-light p-3">
-                <%= data.writter.name %>
+                <%if (data.writter.image != null) {%>
+                    <img src="/img/upload_icon/<%= data.writter.image %>" width="5%" height="5%" class="flex-row-reverse rounded-circle"/>
+                <% } else { %>
+                    <img src="/img/upload_icon/noperson.jpg" width="5%" height="5%" class="flex-row-reverse rounded-circle"/>
+                <% } %>    
+                <a href="/user/<%= data.writter.id %>"><%= data.writter.name %></a>
             </div>
             参加人数
             <hr class="mt-0 mb-2">

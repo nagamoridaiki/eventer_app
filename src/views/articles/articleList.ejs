@@ -29,7 +29,7 @@
             <% } else { %>
                 <img src="/img/upload_icon/noperson.jpg" width="5%" height="5%" class="flex-row-reverse rounded-circle"/>
             <% } %>
-            <p class="card-text"><%= data.content.article[i].User.name %></p>
+            <p class="card-text"><a href="/user/<%= data.content.article[i].User.id %>"><%= data.content.article[i].User.name %></a></p>
             <p class="card-text"><%= data.content.article[i].detail %></p>
             <%if (data.content.article[i].image != null) {%>
                 <img src="/img/uploard_articles/<%= data.content.article[i].image %>" width="30%" height="30%" class="flex-row-reverse"/>
