@@ -24,12 +24,28 @@ const Message = require("../models/message")
 module.exports = {
     index: async(req, res, next) => {
         //全イベント情報取得
-        const articleAllData = await articlesUseCase.articleGetAll();
+        const articleAllData = await articlesUseCase.articleGetAll()
+        //ログインしてるユーザー
+        let user = await userUseCase.findOneUser(res, req.session.user.id);
+        //ログインユーザーのフォロー
+        let follow = user.follower
+        
+        let articleList = [];
+        //フォローしてる人が
+        for (let i = 0 ; i < follow.length ; i++) {
+            //その投稿を書いた人であれば
+            for (let m = 0 ; m < articleAllData.length ; m++) {
+                //フォローした人のidと投稿した人のidが一致すれば
+                if (follow[i].id == articleAllData[m].userId) {
+                    articleList.push(articleAllData[m])
+                }
+            }
+        }
 
         let isLike = [];
         //投稿１つあたり
-        for (let n = 0 ; n < articleAllData.length ; n++) {
-            let likeUsers = articleAllData[n].LikedUser
+        for (let n = 0 ; n < articleList.length ; n++) {
+            let likeUsers = articleList[n].LikedUser
             isLike[n] = 'yetLike'
             //いいねしたユーザー1人ごとにあたり
             for (let i = 0 ; i < likeUsers.length ; i++) {
@@ -45,7 +61,7 @@ module.exports = {
             title: '投稿',
             login: req.session.user,
             content: {
-                article: articleAllData,
+                article: articleList,
                 isLike: isLike
             },
         }
