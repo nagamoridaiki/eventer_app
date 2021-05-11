@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>
+        <%= data.title %>
+    </title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" crossorigin="anonymous">
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+</head>
+
+<body class="container">
+    <header>
+        <h1 class="display-4">
+            <%= data.title %>
+        </h1>
+    </header>
+    <div role="main">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% for(let i in data.users.friends) { %>
+                    <tr>
+                        <td>
+                            <a href="user/<%= data.users.friends[i].id %>">
+                                <%= data.users.friends[i].name %>
+                            </a>
+                        </td>
+                        <td>
+                            <%= data.users.friends[i].email %>
+                        </td>
+                        <td>
+                            <%if (data.users.isFollow[i] == true) {%>
+                                <a href="/user/<%= data.users.friends[i].id %>/follow" class="btn btn-primary">フォローを外す</a>
+                            <% } else { %>
+                                <a href="/user/<%= data.users.friends[i].id %>/follow" class="btn btn-primary">フォロー</a>
+                            <% } %>
+                        </td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+    <p class="h5"><a href="/events">>>イベント一覧へ</a></p>
+</body>
+
+</html>

@@ -178,6 +178,48 @@ module.exports = {
         }
         res.redirect('/user/'+ followId)
     },
+    search: async(req, res, next) => {
+        const users = await userUseCase.userGetAll();
+        let friends = []
+        
+        for (let i = 0 ; i < users.length ; i++) {
+            //ログインユーザー以外の全ての友達
+            if (users[i].id != req.session.user.id) {
+                friends.push(users[i])
+                
+            }
+        }
+
+        let isFollow = []
+        //その友達ひとりずつに対して
+        for (let n = 0 ; n < friends.length ; n++) {
+            //フォロワーが一人もいない場合
+            if (friends[n].followee.length == 0) {
+                isFollow[n] = false
+            }
+            
+            let followee = friends[n].followee;
+            //フォロワーをひとりずつ確認して
+            for (let m = 0 ; m < followee.length ; m++) {
+                //ログインユーザーがフォロワーの中にいれば
+                if (followee[m].id == req.session.user.id) {
+                    isFollow[n] = true
+                } else {
+                    isFollow[n] = false
+                }
+            }
+        }
+
+        const data = {
+            title: 'Search',
+            login: req.session.user,
+            users: {
+                friends: friends,
+                isFollow: isFollow
+            }
+        }
+        res.render("layout", { layout_name: 'search', data} );
+    },
 
 
 
