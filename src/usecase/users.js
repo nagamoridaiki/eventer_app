@@ -41,7 +41,9 @@ module.exports = {
         return oneUser
     },
     userGetAll: async function () {
-        const allUsers = await db.User.findAll()
+        const allUsers = await db.User.findAll({
+            include: ['Event', 'FavoriteEvent', 'follower', 'followee'],
+        })
         .catch(err => {
             res.render('layout', { layout_name: 'error', title: 'ERROR', msg: err });
         });

@@ -36,7 +36,7 @@ router.get('/user/:id/follow', usersController.verifyJWT, usersController.follow
 router.post('/upload', usersController.verifyJWT, usersController.imageUpload);
 
 router.get('/add', usersController.verifyJWT, eventsController.add);
-
+router.get('/userSearch', usersController.verifyJWT, usersController.search);
 
 
 
