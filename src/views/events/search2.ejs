@@ -27,6 +27,9 @@
                     <% if (data.Tags!=null) { for (let n in data.Tags) { %>
                     <li class="nav-item"><a href="/events/search/<%= data.Tags[n].name %>" class="nav-link"><%= data.Tags[n].name %></a></li>
                     <% }} %>
+                    </ul>
+
+                    </ul>
                 </nav>
             </div>
             <div class="col-9">
@@ -70,7 +73,7 @@
                                         <!-- holdDate -->
                                         <dd><%= data.content.holdDate[i].Year %>年<%= data.content.holdDate[i].Month %>月<%= data.content.holdDate[i].Date %>日</dd>
                                         <!-- title -->
-                                        <a href="events/show/<%= data.content.event[i].id %>">
+                                        <a href="/events/show/<%= data.content.event[i].id %>">
                                             <h5><%= data.content.event[i].title %></h5>
                                         </a>
                                         <!-- subTitle -->

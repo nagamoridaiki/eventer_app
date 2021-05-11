@@ -55,8 +55,11 @@ module.exports = {
         const TagName = req.params.TagName;
         const eventAllData = await eventUseCase.eventGetAll();
         let serchResultEvent = [];
+        let holdDate = [];
         //各イベントそれぞれの
         eventAllData.forEach((event) => {
+            //開催日取得
+            holdDate.push(eventUseCase.getHoldDate(event));
             //各タグのそれぞれが
             event.Tag.forEach((eventtags) => {
                 //各イベントについているタグのいずれかが、探したいタグと一致していれば
@@ -67,12 +70,15 @@ module.exports = {
         });
         const tagAllData = await tagUseCase.tagGetAll();
         const data = {
-            title: '検索結果',
+            title: TagName,
             login: req.session.user,
-            content: serchResultEvent,
+            content: {
+                event: serchResultEvent,
+                holdDate: holdDate,
+            },
             Tags: tagAllData,
         }
-        res.render('layout', { layout_name: 'events/search', data });             
+        res.render('layout', { layout_name: 'events/search2', data });             
     },
     history: async(req, res, next) => {
         //userIdを引き取る
@@ -82,17 +88,21 @@ module.exports = {
         const tagAllData = await tagUseCase.tagGetAll();
 
         let holdDate = [];
+        let historyEventList = [];
         let history = oneUser.Event;
-        history.forEach(function(oneEventData, key ) {
+
+        for (let i = 0 ; i < history.length ; i++) {
             //開催日時情報
-            holdDate.push(eventUseCase.getHoldDate(oneEventData)); 
-        });
+            holdDate.push(eventUseCase.getHoldDate(history[i])); 
+            let event = await eventUseCase.findOneEvent(history[i].id)
+            historyEventList[i] = event
+        }
 
         const data = {
             title: 'History',
             login: req.session.user,
             content: {
-                event: oneUser.Event,
+                event: historyEventList,
                 holdDate: holdDate,
             },
             Tags: tagAllData,
@@ -229,23 +239,27 @@ module.exports = {
         //全タグ情報取得
         const tagAllData = await tagUseCase.tagGetAll();
 
+        let FavoritedEventList = [];
         let holdDate = [];
         let FavoriteList = oneUser.FavoriteEvent;
-        FavoriteList.forEach(function(oneEventData, key ) {
+
+        for (let i = 0 ; i < FavoriteList.length ; i++) {
             //開催日時情報
-            holdDate.push(eventUseCase.getHoldDate(oneEventData)); 
-        });
+            holdDate.push(eventUseCase.getHoldDate(FavoriteList[i])); 
+            let event = await eventUseCase.findOneEvent(FavoriteList[i].id)
+            FavoritedEventList[i] = event
+        }
 
         const data = {
             title: 'Favorite',
             login: req.session.user,
             content: {
-                event: oneUser.FavoriteEvent,
+                event: FavoritedEventList,
                 holdDate: holdDate,
             },
             Tags: tagAllData,
         }
-        res.render('layout', { layout_name: 'events/history2', data });
+        res.render('layout', { layout_name: 'events/FavoriteList', data });
 
     },
     imageUpload: async(req, res, next) => {
