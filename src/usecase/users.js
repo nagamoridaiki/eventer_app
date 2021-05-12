@@ -198,6 +198,70 @@ module.exports = {
         });
         return allMessages;
     },
+    isArticleWrittenByFollower: async function (res, articleAllData, follow) {
+        //フォローした人の記事かどうか
+        let articleList = [];
+        //フォローしてる人が
+        for (let i = 0 ; i < follow.length ; i++) {
+            //その投稿を書いた人であれば
+            for (let m = 0 ; m < articleAllData.length ; m++) {
+                //フォローした人のidと投稿した人のidが一致すれば
+                if (follow[i].id == articleAllData[m].userId) {
+                    articleList.push(articleAllData[m])
+                }
+            }
+        }
+        return articleList;
+    },
+    isLikedToArticle: async function (req, articleList) {
+        let isLike = [];
+        //投稿１つあたり
+        for (let n = 0 ; n < articleList.length ; n++) {
+            let likeUsers = articleList[n].LikedUser
+            isLike[n] = 'yetLike'
+            //いいねしたユーザー1人ごとにあたり
+            for (let i = 0 ; i < likeUsers.length ; i++) {
+                //ログインしているユーザーがいいねしているかどうかを判定する。
+                if (likeUsers[i].id == req.session.user.id) {
+                    isLike[n] = 'doLike'
+                    break
+                }
+            }
+        }
+        return isLike
+    },
+    getOthersUsers: async function (req, users) {
+        let friends = []
+        for (let i = 0 ; i < users.length ; i++) {
+            //ログインユーザー以外の全ての友達
+            if (users[i].id != req.session.user.id) {
+                friends.push(users[i])
+            }
+        }
+        return friends
+    },
+    isFollow: async function (req, friends) {
+        let isFollow = []
+        //その友達ひとりずつに対して
+        for (let n = 0 ; n < friends.length ; n++) {
+            //フォロワーが一人もいない場合
+            if (friends[n].followee.length == 0) {
+                isFollow[n] = false
+            }
+            
+            let followee = friends[n].followee;
+            //フォロワーをひとりずつ確認して
+            for (let m = 0 ; m < followee.length ; m++) {
+                //ログインユーザーがフォロワーの中にいれば
+                if (followee[m].id == req.session.user.id) {
+                    isFollow[n] = true
+                } else {
+                    isFollow[n] = false
+                }
+            }
+        }
+        return isFollow
+    },
 
 
 
