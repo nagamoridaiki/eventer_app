@@ -121,15 +121,10 @@ module.exports = {
         //userIdを引き取る
         const UserId = req.params.id;
         const oneUser = await userUseCase.findOneUser(res, UserId);
-
         //ログインユーザーがそのユーザーをフォローしているか
         let follow_flg = await userUseCase.findFollowee(res, oneUser, req.session.user.id);
-
         //そのユーザーとのDM履歴取得
         let messagesList = await userUseCase.getAllMessages(res, UserId, req.session.user.id);
-        //res.json(messagesHistory)
-
-
         
         //取得したuser情報をもとに画面にレンダリング
         const data = {
@@ -180,35 +175,10 @@ module.exports = {
     },
     search: async(req, res, next) => {
         const users = await userUseCase.userGetAll();
-        let friends = []
-        
-        for (let i = 0 ; i < users.length ; i++) {
-            //ログインユーザー以外の全ての友達
-            if (users[i].id != req.session.user.id) {
-                friends.push(users[i])
-                
-            }
-        }
-
-        let isFollow = []
-        //その友達ひとりずつに対して
-        for (let n = 0 ; n < friends.length ; n++) {
-            //フォロワーが一人もいない場合
-            if (friends[n].followee.length == 0) {
-                isFollow[n] = false
-            }
-            
-            let followee = friends[n].followee;
-            //フォロワーをひとりずつ確認して
-            for (let m = 0 ; m < followee.length ; m++) {
-                //ログインユーザーがフォロワーの中にいれば
-                if (followee[m].id == req.session.user.id) {
-                    isFollow[n] = true
-                } else {
-                    isFollow[n] = false
-                }
-            }
-        }
+        //ログインユーザー以外のユーザーを全て取得
+        let friends = await userUseCase.getOthersUsers(req, users);
+        //そのユーザーひとりずつに対してフォローしているか
+        let isFollow = await userUseCase.isFollow(req, friends);
 
         const data = {
             title: 'Search',

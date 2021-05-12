@@ -27,35 +27,10 @@ module.exports = {
         const articleAllData = await articlesUseCase.articleGetAll()
         //ログインしてるユーザー
         let user = await userUseCase.findOneUser(res, req.session.user.id);
-        //ログインユーザーのフォロー
-        let follow = user.follower
-        
-        let articleList = [];
-        //フォローしてる人が
-        for (let i = 0 ; i < follow.length ; i++) {
-            //その投稿を書いた人であれば
-            for (let m = 0 ; m < articleAllData.length ; m++) {
-                //フォローした人のidと投稿した人のidが一致すれば
-                if (follow[i].id == articleAllData[m].userId) {
-                    articleList.push(articleAllData[m])
-                }
-            }
-        }
-
-        let isLike = [];
-        //投稿１つあたり
-        for (let n = 0 ; n < articleList.length ; n++) {
-            let likeUsers = articleList[n].LikedUser
-            isLike[n] = 'yetLike'
-            //いいねしたユーザー1人ごとにあたり
-            for (let i = 0 ; i < likeUsers.length ; i++) {
-                //ログインしているユーザーがいいねしているかどうかを判定する。
-                if (likeUsers[i].id == req.session.user.id) {
-                    isLike[n] = 'doLike'
-                    break
-                }
-            }
-        }
+        //フォローした人の記事かどうか
+        let articleList = await userUseCase.isArticleWrittenByFollower(res, articleAllData, user.follower)
+        //フォローした人の記事にいいねしているか
+        let isLike = await userUseCase.isLikedToArticle(req, articleList)
 
         const data = {
             title: '投稿',
@@ -66,7 +41,6 @@ module.exports = {
             },
         }
         res.render('layout', { layout_name: 'articles/articleList', data });
-
     },
     add: (req, res, next) => {
         const data = {
