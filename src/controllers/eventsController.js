@@ -32,7 +32,7 @@ module.exports = {
         });
 
         //お気に入りが数多く付けられている順番でイベントのidを取得する。
-        let maxFavoriteEventId = await eventUseCase.eachEventFavoriteLength(eventAllData)
+        let maxFavoriteEventId = await eventUseCase.eachEventFavoriteLength(res, eventAllData)
         
         const mostFavoriteEvent = await eventUseCase.findOneEvent(maxFavoriteEventId[0]);
         const secondFavoriteEvent = await eventUseCase.findOneEvent(maxFavoriteEventId[1]);

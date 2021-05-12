@@ -81,7 +81,7 @@ module.exports = {
         };
         return holdDate;
     },
-    eachEventFavoriteLength: function (eventAllData) {
+    eachEventFavoriteLength: function (res, eventAllData) {
         let favoriteLengthList = {};
 
         if (eventAllData.length == 0) return false;
@@ -91,17 +91,23 @@ module.exports = {
             let favoriteLength = oneEventData.UserFavorite.length
             favoriteLengthList[oneEventData.id] = favoriteLength//イベントのid : お気に入りの数
         });
+        console.log(favoriteLengthList)
         let allEventId = Object.keys(favoriteLengthList);
 
         let favoriteEventList = []
         //一番お気に入りがつけられているイベントのidを取得
-        let mostFavoritedEventId = favariteLengthCount(allEventId, favoriteLengthList)
+        let mostFavoritedEventId = favariteLengthCount(res, allEventId, favoriteLengthList)
 
         favoriteEventList.push(mostFavoritedEventId)
 
         //二番目にお気に入りがつけられているイベントのidを取得
-        allEventId.pop(mostFavoritedEventId)
-        let secondFavoritedEventId = favariteLengthCount(allEventId, favoriteLengthList)
+        for(let i = 0 ; i < allEventId.length ; i++){
+            if(allEventId[i] == mostFavoritedEventId){
+                //spliceメソッドで要素を削除
+                allEventId.splice(i, 1);
+            }
+        }
+        let secondFavoritedEventId = favariteLengthCount(res, allEventId, favoriteLengthList)
 
         favoriteEventList.push(secondFavoritedEventId)
 
@@ -172,14 +178,14 @@ module.exports = {
 
 }
 
-function favariteLengthCount (allEventId, favoriteLengthList) {
+function favariteLengthCount (res, allEventId, favoriteLengthList) {
     let FavoriteCount = 0
     let mostFavoritedEventId
     for( let i = 0; i < allEventId.length; i++ ) {
         //一番大きい要素のみが最後にFavoriteCountに渡されるようにする。
         let oneEventId = allEventId[i]
         if (i == 0) {
-            mostFavoritedEventId = oneEventId;
+            mostFavoritedEventId = oneEventId;// 1
         }
         if (FavoriteCount < favoriteLengthList[oneEventId]){
             FavoriteCount = favoriteLengthList[oneEventId]
