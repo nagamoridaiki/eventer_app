@@ -28,8 +28,6 @@
                     <li class="nav-item"><a href="/events/search/<%= data.Tags[n].name %>" class="nav-link"><%= data.Tags[n].name %></a></li>
                     <% }} %>
                     </ul>
-
-                    </ul>
                 </nav>
             </div>
             <div class="col-9">
@@ -57,11 +55,11 @@
                                             <i class="fas fa-ellipsis-v"></i>
                                           </a>
                                           <div class="dropdown-menu dropdown-menu-right">
-                                            <a class="dropdown-item" href="events/edit/<%= data.content.event[i].id %>">
+                                            <a class="dropdown-item" href="/events/edit/<%= data.content.event[i].id %>">
                                               <i class="fas fa-pen mr-1"></i>記事を更新する
                                             </a>
                                             <div class="dropdown-divider"></div>
-                                            <a class="dropdown-item" href="events/delete/<%= data.content.event[i].id %>">
+                                            <a class="dropdown-item" href="/events/delete/<%= data.content.event[i].id %>">
                                                 <i class="fas fa-trash-alt mr-1"></i>記事を削除する
                                             </a>
                                           </div>

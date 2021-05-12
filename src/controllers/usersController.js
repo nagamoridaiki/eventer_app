@@ -140,7 +140,7 @@ module.exports = {
             login: req.session.user,
             messagesList: messagesList,
         }
-        res.render('layout', { layout_name: 'myprof2', data });
+        res.render('layout', { layout_name: 'myprof', data });
     },
     Edit: async(req, res, next) => {
         //userIdを引き取る

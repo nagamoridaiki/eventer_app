@@ -48,7 +48,7 @@ module.exports = {
             maxFavoriteEvent: mostFavoriteEvent,
             secondFavoriteEvent: secondFavoriteEvent,
         }
-        res.render('layout', { layout_name: 'events/list2', data });
+        res.render('layout', { layout_name: 'events/list', data });
 
     },
     search: async(req, res, next) => {
@@ -78,7 +78,7 @@ module.exports = {
             },
             Tags: tagAllData,
         }
-        res.render('layout', { layout_name: 'events/search2', data });             
+        res.render('layout', { layout_name: 'events/search', data });             
     },
     history: async(req, res, next) => {
         //userIdを引き取る
@@ -107,7 +107,7 @@ module.exports = {
             },
             Tags: tagAllData,
         }
-        res.render('layout', { layout_name: 'events/history2', data });
+        res.render('layout', { layout_name: 'events/history', data });
 
     },
     add: (req, res, next) => {
@@ -116,7 +116,7 @@ module.exports = {
             login: req.session.user,
             err: null
         }
-        res.render('layout', { layout_name: 'events/add2', data });
+        res.render('layout', { layout_name: 'events/add', data });
     },
     create: async(req, res, next) => {
         //イベント作成
@@ -145,7 +145,7 @@ module.exports = {
             err: null,
             holdDate: holdDate,
         }
-        res.render('layout', { layout_name: 'events/edit2', data });
+        res.render('layout', { layout_name: 'events/edit', data });
 
     },
     update: async(req, res, next) => {
@@ -206,7 +206,7 @@ module.exports = {
             err: null,
             holdDate: holdDate,
         }
-        res.render('layout', { layout_name: 'events/show2', data });
+        res.render('layout', { layout_name: 'events/show', data });
     },
     delete: async(req, res, next) => {
         const deletedEventId = await eventUseCase.eventDelete(req.params.id);

@@ -54,11 +54,11 @@
                                             <i class="fas fa-ellipsis-v"></i>
                                           </a>
                                           <div class="dropdown-menu dropdown-menu-right">
-                                            <a class="dropdown-item" href="events/edit/<%= data.content.event[i].id %>">
+                                            <a class="dropdown-item" href="/events/edit/<%= data.content.event[i].id %>">
                                               <i class="fas fa-pen mr-1"></i>記事を更新する
                                             </a>
                                             <div class="dropdown-divider"></div>
-                                            <a class="dropdown-item" href="events/delete/<%= data.content.event[i].id %>">
+                                            <a class="dropdown-item" href="/events/delete/<%= data.content.event[i].id %>">
                                                 <i class="fas fa-trash-alt mr-1"></i>記事を削除する
                                             </a>
                                           </div>
@@ -70,7 +70,7 @@
                                         <!-- holdDate -->
                                         <dd><%= data.content.holdDate[i].Year %>年<%= data.content.holdDate[i].Month %>月<%= data.content.holdDate[i].Date %>日</dd>
                                         <!-- title -->
-                                        <a href="events/show/<%= data.content.event[i].id %>">
+                                        <a href="/events/show/<%= data.content.event[i].id %>">
                                             <h5><%= data.content.event[i].title %></h5>
                                         </a>
                                         <!-- subTitle -->
