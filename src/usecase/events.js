@@ -13,6 +13,11 @@ const moment = require('moment')
 const path = require('path');
 const sharp = require('sharp');
 
+const AWS = require('aws-sdk');
+var awsCredFile = path.join(__dirname, '../config/AwsConfig.json');
+AWS.config.loadFromPath(awsCredFile);
+
+
 module.exports = {
     eventGetAll: async function () {
         const allEvent = await db.Event.findAll({
@@ -175,6 +180,32 @@ module.exports = {
             console.log(err); next(err);
         }
     },
+    fileUploadToS3: async function (req, res, next, newEventId) {
+    
+        const s3 = new AWS.S3();
+    
+        // Binary data base64
+        console.log("画像アップロードテスト", req.files.uploadFile)
+        const fileContent  = Buffer.from(req.files.uploadFile.data, 'binary');
+    
+        // Setting up S3 upload parameters
+        const params = {
+            Bucket: 'eventernagamori',
+            Key: "test3.jpg", // File name you want to save as in S3
+            Body: fileContent 
+        };
+    
+        // Uploading files to the bucket
+        s3.upload(params, function(err, data) {
+            if (err) {
+                throw err;
+            }
+            res.redirect('/events/')
+            
+        });
+
+    }
+
 
 }
 
