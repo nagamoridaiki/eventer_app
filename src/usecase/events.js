@@ -183,29 +183,33 @@ module.exports = {
     fileUploadToS3: async function (req, res, next, newEventId) {
     
         const s3 = new AWS.S3();
-    
-        // Binary data base64
         console.log("画像アップロードテスト", req.files.uploadFile)
         const fileContent  = Buffer.from(req.files.uploadFile.data, 'binary');
+        const fileName = req.session.newEvent + req.files.uploadFile.name//画像名
     
         // Setting up S3 upload parameters
         const params = {
             Bucket: 'eventernagamori',
-            Key: "test3.jpg", // File name you want to save as in S3
+            Key: fileName,
             Body: fileContent 
         };
+
+        await db.Event.update({
+            image: fileName,
+        }, {
+            where: { id: newEventId }
+        }).catch(err => {
+            res.render('layout', { layout_name: 'error', title: 'ERROR', msg: err });
+        })
     
         // Uploading files to the bucket
         s3.upload(params, function(err, data) {
             if (err) {
                 throw err;
             }
-            res.redirect('/events/')
-            
         });
-
+        res.redirect('/events/')
     }
-
 
 }
 
