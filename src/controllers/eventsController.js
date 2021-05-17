@@ -264,7 +264,7 @@ module.exports = {
     },
     imageUpload: async(req, res, next) => {
         const newEventId = req.session.newEvent
-        await eventUseCase.fileUpload(req, res, next, newEventId);
+        await eventUseCase.fileUploadToS3(req, res, next, newEventId);
 
         req.session.newEvent = null;
         res.redirect('/events');

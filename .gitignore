@@ -6,3 +6,4 @@ node_modules/
 package-lock.json
 src/public/images/
 src/public/img/
+src/config/AwsConfig.json
