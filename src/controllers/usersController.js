@@ -156,7 +156,7 @@ module.exports = {
         res.redirect('/user/' + req.session.user.id)
     },
     imageUpload: async(req, res, next) => {
-        await userUseCase.fileUpload(req, res, next);
+        await userUseCase.fileUploadToS3(req, res, next);
         
         res.redirect('/user/' + req.session.user.id)
     },
