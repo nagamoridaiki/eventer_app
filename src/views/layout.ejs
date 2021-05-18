@@ -39,9 +39,9 @@
         <%if (data.login) {%>
             <div style="color: #efeff5;">Login as <%= data.login.name %>　</div>
             <%if (data.login.image) {%>
-              <img src="/img/upload_icon/<%= data.login.image %>" width="4%" height="4%" style="text-align: right;"/>
+              <img src="https://eventernagamori.s3-ap-northeast-1.amazonaws.com/users/<%= data.login.image %>" width="4%" height="4%" style="text-align: right;"/>
             <%} else {%>
-              <img src="/img/upload_icon/noperson.jpg" width="4%" height="4%" style="text-align: right;"/>
+              <img src="https://eventernagamori.s3-ap-northeast-1.amazonaws.com/fixedImage/noperson.jpg" width="4%" height="4%" style="text-align: right;"/>
             <% } %>
         <% } %>
     </nav>

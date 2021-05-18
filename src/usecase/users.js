@@ -16,6 +16,10 @@ const path = require('path');
 const sharp = require('sharp');
 const { Op } = require("sequelize");
 
+const AWS = require('aws-sdk');
+var awsCredFile = path.join(__dirname, '../config/AwsConfig.json');
+AWS.config.loadFromPath(awsCredFile);
+
 module.exports = {
     findOneUser: async function (res, userId) {
         const oneUser = await db.User.findOne({
@@ -143,6 +147,36 @@ module.exports = {
         } catch (err) {
             console.log(err); next(err);
         }
+    },
+    fileUploadToS3: async function (req, res, next) {
+        const s3 = new AWS.S3();
+        console.log("画像アップロードテスト", req.files.uploadFile)
+        const fileContent  = Buffer.from(req.files.uploadFile.data, 'binary');
+        const fileName = req.session.user.id + req.session.user.name + req.files.uploadFile.name//画像名
+    
+        // Setting up S3 upload parameters
+        const params = {
+            Bucket: 'eventernagamori/users',
+            Key: fileName,
+            Body: fileContent 
+        };
+
+        await db.User.update({
+            image: fileName,
+        }, {
+            where: { id: req.session.user.id }
+        }).catch(err => {
+            res.render('layout', { layout_name: 'error', title: 'ERROR', msg: err });
+        })
+    
+        // Uploading files to the bucket
+        s3.upload(params, function(err, data) {
+            if (err) {
+                throw err;
+            }
+        });
+        res.redirect('/user/' + req.session.user.id)
+
     },
     findFollowee: async function (res, oneUser, loginUserId) {
         let alwaysFollow = false;

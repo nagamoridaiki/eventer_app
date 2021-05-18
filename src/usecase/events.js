@@ -189,7 +189,7 @@ module.exports = {
     
         // Setting up S3 upload parameters
         const params = {
-            Bucket: 'eventernagamori',
+            Bucket: 'eventernagamori/events',
             Key: fileName,
             Body: fileContent 
         };

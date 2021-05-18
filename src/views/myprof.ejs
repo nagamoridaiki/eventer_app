@@ -17,7 +17,7 @@
                 <div class="row">
                     <div class="col-3">
                         <% if (data.user.image) {%>
-                            <img src="/img/upload_icon/<%= data.user.image %>" width="50%" height="50%" class="img-fluid"/>
+                            <img src="https://eventernagamori.s3-ap-northeast-1.amazonaws.com/users/<%= data.user.image %>" width="50%" height="50%" class="img-fluid"/>
                         <% } else { %>
                             <img src="/img/upload_icon/noperson.jpg" width="50%" height="50%" class="img-fluid"/>
                         <% } %>
