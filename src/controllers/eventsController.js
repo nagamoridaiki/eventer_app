@@ -230,7 +230,7 @@ module.exports = {
         //参加表明と参加辞退を切り替える
         favoriteData ? await favoriteUseCase.exit(res, req.body) : await favoriteUseCase.entry(res, req.body)
 
-        res.redirect('/events');
+        res.redirect('/events/show/' + req.body.eventId);
     },
     FavoriteList: async(req, res, next) => {
         //userIdを引き取る

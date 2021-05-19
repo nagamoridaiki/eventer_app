@@ -50,6 +50,22 @@
         </div>
 
         <div class="col-6">
+            <%if (data.isFavorite == true) {%>
+                <form method="post" action="/events/Favorite">
+                    <input type="hidden" name="userId" value="<%= data.login.id %>">
+                    <input type="hidden" name="eventId" value="<%= data.event.id %>">
+                    <button style="border:none; background-color:white; color:greenyellow; font-size: 20px;" type="submit"><i class="fas fa-star"></i></button>お気に入りです
+                </form>
+            <% } %>
+            <%if (data.isFavorite == false) {%>
+                <form method="post" action="/events/Favorite">
+                    <input type="hidden" name="userId" value="<%= data.login.id %>">
+                    <input type="hidden" name="eventId" value="<%= data.event.id %>">
+                    <button style="border:none; background-color:white;" type="submit"><span class="far fa-star">お気に入りに登録する</span></button>
+                </form>
+            <% } %>
+            <hr class="mt-0 mb-2">
+        
             詳細
             <hr class="mt-0 mb-2">
             <div class="tab-content bg-light p-3">
@@ -77,7 +93,7 @@
             </div>
             会場
             <hr class="mt-0 mb-2">
-            <div class="tab-content bg-light p-3" id="address" value="いいい">
+            <div class="tab-content bg-light p-3" id="address">
                 <%= data.event.address %>
             </div>
             <div id="map"></div> 
@@ -102,20 +118,6 @@
         <a href="/events/delete/<%= data.event.id %>" class="btn btn-primary">削除する</a>
     <% } %>
 
-    <%if (data.isFavorite == true) {%>
-        <form method="post" action="/events/Favorite">
-            <input type="hidden" name="userId" value="<%= data.login.id %>">
-            <input type="hidden" name="eventId" value="<%= data.event.id %>">
-            <input class="btn btn-primary" type="submit" value="お気に入りを外す">
-        </form>
-    <% } %>
-    <%if (data.isFavorite == false) {%>
-        <form method="post" action="/events/Favorite">
-            <input type="hidden" name="userId" value="<%= data.login.id %>">
-            <input type="hidden" name="eventId" value="<%= data.event.id %>">
-            <input class="btn btn-success" type="submit" value="お気に入りに登録する">
-        </form>
-    <% } %>
 </body>
 
 <script> 
