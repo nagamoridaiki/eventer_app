@@ -39,9 +39,11 @@
                                 <% } %>
                                 <% } %>
                             </div>
+                            <% if (data.user.id != data.login.id) {%>
                             <div class="col-3">
                                 <a href="#message_<%= data.user.id %>" data-toggle="modal">DMする</a>
                             </div>
+                            <% } %>
                         </div>
                         
                         <div class="card-body">
@@ -77,7 +79,16 @@
                                 <table>
                                     <tbody>
                                         <% data.user.follower.forEach(follower => { %>
-                                            <tr><td><%= follower.name %></td></tr>
+                                            <tr>
+                                                <td>
+                                                    <%if (follower.image != null) {%>
+                                                        <img src="https://eventernagamori.s3-ap-northeast-1.amazonaws.com/users/<%= follower.image %>" width="25px" height="25px" class="flex-row-reverse rounded-circle"/>
+                                                    <% } else { %>
+                                                        <img src="https://eventernagamori.s3-ap-northeast-1.amazonaws.com/fixedImage/noperson.jpg" width="25px" height="25px" class="flex-row-reverse rounded-circle"/>
+                                                    <% } %>
+                                                </td>
+                                                <td><a href="/user/<%= follower.id %>"><%= follower.name %></a></td>
+                                            </tr>
                                         <% }); %>
                                     </tbody>
                                 </table>
@@ -89,7 +100,16 @@
                                 <table>
                                     <tbody>
                                         <% data.user.followee.forEach(followee => { %>
-                                            <tr><td><%= followee.name %></td></tr>
+                                            <tr>
+                                                <td>
+                                                    <%if (followee.image != null) {%>
+                                                        <img src="https://eventernagamori.s3-ap-northeast-1.amazonaws.com/users/<%= followee.image %>" width="25px" height="25px" class="flex-row-reverse rounded-circle"/>
+                                                    <% } else { %>
+                                                        <img src="https://eventernagamori.s3-ap-northeast-1.amazonaws.com/fixedImage/noperson.jpg" width="25px" height="25px" class="flex-row-reverse rounded-circle"/>
+                                                    <% } %>
+                                                </td>
+                                                <td><a href="/user/<%= followee.id %>"><%= followee.name %></a></td>
+                                            </tr>
                                         <% }); %>
                                     </tbody>
                                 </table>

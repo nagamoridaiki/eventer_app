@@ -296,6 +296,22 @@ module.exports = {
         }
         return isFollow
     },
+    searchUserByName: async function (req, res) {
+        let findUsers = await db.User.findAll({
+            include: ['Event', 'FavoriteEvent', 'follower', 'followee'],
+            where: {
+                name: {
+                    [Op.like]: '%'+ req.body.name +'%'//文字を含む
+                  }
+            },
+            order: [
+                ['updatedAt', 'ASC']
+            ],
+        }).catch(err => {
+            res.render('layout', { layout_name: 'error', title: 'ERROR', msg: err });
+        });
+        return findUsers;
+    }
 
 
 

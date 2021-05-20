@@ -11,9 +11,10 @@
 </head>
 
 <body class="container">
+    <br><br>
     <header>
         <h1 class="display-4">
-            <%= data.title %>
+            ユーザー
         </h1>
     </header>
     <div role="main">
@@ -29,6 +30,11 @@
                 <% for(let i in data.users.friends) { %>
                     <tr>
                         <td>
+                            <%if (data.users.friends[i].image != null) {%>
+                                <img src="https://eventernagamori.s3-ap-northeast-1.amazonaws.com/users/<%= data.users.friends[i].image %>" width="25px" height="25px" class="flex-row-reverse rounded-circle"/>
+                            <% } else { %>
+                                <img src="https://eventernagamori.s3-ap-northeast-1.amazonaws.com/fixedImage/noperson.jpg" width="25px" height="25px" class="flex-row-reverse rounded-circle"/>
+                            <% } %>                
                             <a href="user/<%= data.users.friends[i].id %>">
                                 <%= data.users.friends[i].name %>
                             </a>
