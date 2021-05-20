@@ -25,7 +25,7 @@ router.post('/upload', usersController.verifyJWT, usersController.imageUpload);
 
 router.get('/add', usersController.verifyJWT, eventsController.add);
 router.get('/userSearch', usersController.verifyJWT, usersController.search);
-
+router.post('/search', usersController.verifyJWT, usersController.searchUser);
 
 
 module.exports = router;

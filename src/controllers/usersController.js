@@ -190,6 +190,25 @@ module.exports = {
         }
         res.render("layout", { layout_name: 'search', data} );
     },
+    searchUser: async(req, res, next) => {
+        //検索バーに入力した文字を名前に含むユーザー
+        const users = await userUseCase.searchUserByName(req, res);
+        //ログインユーザー以外のユーザーを全て取得
+        let friends = await userUseCase.getOthersUsers(req, users);
+        //そのユーザーひとりずつに対してフォローしているか
+        let isFollow = await userUseCase.isFollow(req, friends);
+
+        const data = {
+            title: 'Search',
+            login: req.session.user,
+            users: {
+                friends: friends,
+                isFollow: isFollow
+            }
+        }
+        res.render("layout", { layout_name: 'search', data} );
+
+    }
 
 
 

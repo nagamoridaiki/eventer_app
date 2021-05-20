@@ -34,6 +34,9 @@
             <li class="nav-item"><a href="/events/FavoriteList" class="nav-link">お気に入り</a></li>
             <li class="nav-item"><a href="/articles/add" class="nav-link">記事を投稿する</a></li>
             <li class="nav-item"><a href="/articles/" class="nav-link">タイムライン</a></li>
+            <%if (data.login) {%>
+            <li class="nav-item"><a href="/user/<%= data.login.id %>" class="nav-link">マイプロフィール</a></li>
+            <% } %>
           </ul>
         </div>
         <%if (data.login) {%>
