@@ -180,7 +180,7 @@ module.exports = {
             console.log(err); next(err);
         }
     },
-    fileUploadToS3: async function (req, res, next, newEventId) {
+    fileCreateToS3: async function (req, res, next, newEventId) {
     
         const s3 = new AWS.S3();
         console.log("画像アップロードテスト", req.files.uploadFile)
@@ -209,7 +209,34 @@ module.exports = {
             }
         });
         res.redirect('/events/')
-    }
+    },
+    fileUploadToS3: async function (req, res, next, updateEventId) {
+    
+        const s3 = new AWS.S3();
+        console.log("画像アップロードテスト", req.files.file)
+        const fileContent  = Buffer.from(req.files.file.data, 'binary');
+        const fileName = req.session.newEvent + req.files.file.name//画像名
+        // Setting up S3 upload parameters
+        const params = {
+            Bucket: 'eventernagamori/events',
+            Key: fileName,
+            Body: fileContent 
+        };
+        await db.Event.update({
+            image: fileName,
+        }, {
+            where: { id: updateEventId }
+        }).catch(err => {
+            res.render('layout', { layout_name: 'error', title: 'ERROR', msg: err });
+        })
+
+        s3.upload(params, function(err, data) {
+            if (err) {
+                throw err;
+            }
+        });
+        
+    },
 
 }
 

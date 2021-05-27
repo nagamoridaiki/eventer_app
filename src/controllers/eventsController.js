@@ -150,6 +150,7 @@ module.exports = {
     },
     update: async(req, res, next) => {
         const EventId = req.params.id;
+        req.session.updateEventId = EventId;
         //イベント情報のアップデート
         await eventUseCase.eventUpdate(res, EventId, req.body);
         next();
@@ -167,8 +168,8 @@ module.exports = {
             let findTag = await tagUseCase.findOrCreate(res, tag);
             //タグをイベントと紐付け
             tagUseCase.eventTagCreate(res, findEvent, findTag);
-            res.redirect('/events');
         });
+        next()
     },
     show: async(req, res, next) => {
         const EventId = req.params.id;
@@ -262,11 +263,17 @@ module.exports = {
         res.render('layout', { layout_name: 'events/FavoriteList', data });
 
     },
-    imageUpload: async(req, res, next) => {
+    imageRegister: async(req, res, next) => {
         const newEventId = req.session.newEvent
-        await eventUseCase.fileUploadToS3(req, res, next, newEventId);
+        await eventUseCase.fileCreateToS3(req, res, next, newEventId);
 
         req.session.newEvent = null;
+        res.redirect('/events');
+    },
+    imageUpload: async(req, res, next) => {
+        const updateEventId = req.session.updateEventId
+        await eventUseCase.fileUploadToS3(req, res, next, updateEventId);
+        req.session.updateEventId = null;
         res.redirect('/events');
     }
 
