@@ -42,7 +42,7 @@ module.exports = {
             title: 'Register',
             login: req.session.user,
         }
-        res.render('layout', { layout_name: 'Register', title: 'Register', data });
+        res.render('layout', { layout_name: 'register', title: 'Register', data });
     },
 
     index: async(req, res, next) => {

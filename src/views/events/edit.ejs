@@ -69,7 +69,7 @@
             <br>
             <div class="form-group mb-4">
             <label for="B_address">開催日</label>
-            <input type="datetime-local" class="" name="holdDate" value="<%= data.event.holdDate %>">
+            <input type="datetime-local" class="" name="holdDate" value="<%= data.holdDate.Year %>-0<%= data.holdDate.Month %>-<%= data.holdDate.Date %>T<%= data.holdDate.Time %>">
             <div class="input-group-prepend">
                 編集前: 
                 <div><%= data.holdDate.Year %>年<%= data.holdDate.Month %>月<%= data.holdDate.Date %>日</div>
