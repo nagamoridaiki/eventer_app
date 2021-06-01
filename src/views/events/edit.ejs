@@ -25,7 +25,7 @@
 
             <div class="form-group mb-4">
             <label for="B_Name">タイトル</label>
-            <input type="text" name="title" class="form-control" value="<%= data.event.title %>">
+            <input type="text" name="title" class="form-control" value="<%= data.event.title %>" required>
             <ul class="text-danger">
                 <% if (data.err!=null) { for (let i in data.err.get("title")) { %>
                     <li>
@@ -49,7 +49,7 @@
 
             <div class="form-group mb-4">
             <label for="B_address">詳細</label>
-            <textarea type="text" name="detail" class="form-control" rows="10"><%= data.event.detail %></textarea>
+            <textarea type="text" name="detail" class="form-control" rows="10" required><%= data.event.detail %></textarea>
             <ul class="text-danger">
                 <% if (data.err!=null) { for (let i in data.err.get("detail")) { %>
                     <li>
@@ -69,7 +69,7 @@
             <br>
             <div class="form-group mb-4">
             <label for="B_address">開催日</label>
-            <input type="datetime-local" class="" name="holdDate" value="<%= data.holdDate.Year %>-<%= data.holdDate.Month %>-<%= data.holdDate.Date %>T<%= data.holdDate.Time %>">
+            <input type="datetime-local" class="" name="holdDate" value="<%= data.holdDate.Year %>-<%= data.holdDate.Month %>-<%= data.holdDate.Date %>T<%= data.holdDate.Time %>" required>
             <div class="input-group-prepend">
             </div>
             </div>
@@ -89,9 +89,6 @@
                 <option value="40">40名</option>
                 <option value="50">50名</option>
             </select>
-            <div class="input-group-prepend">
-                編集前: <%= data.event.capacity %>名
-            </div>
             </div>
         
             <div class="form-group mb-4">

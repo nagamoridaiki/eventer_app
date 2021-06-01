@@ -157,7 +157,11 @@ module.exports = {
     create: async(req, res, next) => {
         //イベント作成
         const newEventData = await eventUseCase.eventCreate(req.session.user.id, req.body);
+        req.session.newEvent = newEventData.id
         //タグ作成およびイベントとの紐付け
+        if (req.body.tags == "") {
+            next()
+        }
         let tags = JSON.parse(req.body.tags);
         //tagの数だけ繰り返す
         tags.forEach(async function(tag, key ) {
@@ -165,7 +169,6 @@ module.exports = {
             let findTag = await tagUseCase.findOrCreate(res, tag);
             //タグをイベントと紐付け
             tagUseCase.eventTagCreate(res, newEventData, findTag);
-            req.session.newEvent = newEventData.id
             next()
         });
     },
@@ -197,6 +200,9 @@ module.exports = {
         //古いイベントタグ紐付け情報をいったん消す
         await tagUseCase.eventTagDestroy(res, EventId);
         //タグ作成およびイベントとの紐付け
+        if (!req.body.tags) {
+            next()
+        }
         let tags = JSON.parse(req.body.tags);
         //tagの数だけ繰り返す
         tags.forEach(async function(tag, key ) {
