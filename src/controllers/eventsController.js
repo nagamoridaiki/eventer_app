@@ -24,32 +24,68 @@ module.exports = {
         const eventAllData = await eventUseCase.eventGetAll();
         //全タグ情報取得
         const tagAllData = await tagUseCase.tagGetAll();
+        //res.json(eventAllData)
+        const sort_target = 'holdDate';
+        eventAllData.sort((a, b) => a[sort_target] - b[sort_target]);
 
         let holdDate = [];
-        eventAllData.forEach(function(oneEventData, key ) {
+        eventAllData.forEach(function(oneEventData) {
             //開催日時情報
             holdDate.push(eventUseCase.getHoldDate(oneEventData));
         });
 
+        let box = []
+        for (let m = 0 ; m < eventAllData.length ; m++) {
+            box[m] = {
+                event : eventAllData[m],
+                datetime : holdDate[m]
+            }
+        }
+        
+
+        let filterHoldDate = holdDate.filter((element, index, self) =>
+            self.findIndex(e => 
+                e.Year === element.Year &&
+                e.Month === element.Month &&
+                e.Date === element.Date
+                ) === index
+            );
+
+       let dateTimeList = []
+       let displayEventData = []
+        for (let i = 0 ; i < filterHoldDate.length ; i++) {
+            let oneHoldDate = []
+            let oneDay = ""
+            for (let n = 0 ; n < box.length ; n++) {
+                if (filterHoldDate[i].Month == box[n].datetime.Month &&
+                    filterHoldDate[i].Date == box[n].datetime.Date) {
+                        oneHoldDate.push(box[n].event)
+                }
+            }
+            oneDay = String(filterHoldDate[i].Year)+"-"+String(filterHoldDate[i].Month)+"-"+String(filterHoldDate[i].Date)
+            
+            displayEventData[i] = oneHoldDate
+            dateTimeList[i] = oneDay
+            
+        }
         //お気に入りが数多く付けられている順番でイベントのidを取得する。
         let maxFavoriteEventId = await eventUseCase.eachEventFavoriteLength(res, eventAllData)
         
         const mostFavoriteEvent = await eventUseCase.findOneEvent(maxFavoriteEventId[0]);
         const secondFavoriteEvent = await eventUseCase.findOneEvent(maxFavoriteEventId[1]);
-
+        
         const data = {
             title: 'Event',
             login: req.session.user,
-            content: {
-                event: eventAllData,
-                holdDate: holdDate,
-            },
+            holdDate: holdDate,
+            displayEventData: displayEventData,
+            dateTimeList: dateTimeList,
             Tags: tagAllData,
             maxFavoriteEvent: mostFavoriteEvent,
             secondFavoriteEvent: secondFavoriteEvent,
         }
-        res.render('layout', { layout_name: 'events/list', data });
-
+        res.render('layout', { layout_name: 'events/dateTimeList', data });
+        
     },
     search: async(req, res, next) => {
         const TagName = req.params.TagName;

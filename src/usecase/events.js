@@ -74,10 +74,16 @@ module.exports = {
     },
     //開催日時情報の取得
     getHoldDate: function (oneEvent){
-        const Year = moment(oneEvent.holdDate).format('Y');
-        const Month = moment(oneEvent.holdDate).format('M');
-        const Date = moment(oneEvent.holdDate).format('D');
-        const Time = moment(oneEvent.holdDate).format('HH:mm');
+        let Year = moment(oneEvent.holdDate).format('Y');
+        let Month = moment(oneEvent.holdDate).format('M');
+        let Date = moment(oneEvent.holdDate).format('D');
+        let Time = moment(oneEvent.holdDate).format('HH:mm');
+        if (Month.length == 1) {
+            Month = "0" + Month
+        }
+        if (Date.length == 1) {
+            Date = "0" + Date
+        }
         const holdDate = {
             Year: Year,
             Month: Month,
