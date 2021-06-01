@@ -188,8 +188,10 @@ module.exports = {
     },
     fileCreateToS3: async function (req, res, next, newEventId) {
     
+        if (req.files == null || !req.files.uploadFile) {
+            res.redirect('/events/')
+        }
         const s3 = new AWS.S3();
-        console.log("画像アップロードテスト", req.files.uploadFile)
         const fileContent  = Buffer.from(req.files.uploadFile.data, 'binary');
         const fileName = req.session.newEvent + req.files.uploadFile.name//画像名
     
@@ -218,6 +220,9 @@ module.exports = {
     },
     fileUploadToS3: async function (req, res, next, updateEventId) {
     
+        if (!req.files) {
+            res.redirect('/events/')
+        }
         const s3 = new AWS.S3();
         console.log("画像アップロードテスト", req.files.file)
         const fileContent  = Buffer.from(req.files.file.data, 'binary');
