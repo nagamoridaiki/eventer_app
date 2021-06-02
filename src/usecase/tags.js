@@ -14,8 +14,31 @@ const moment = require('moment')
 
 module.exports = {
     tagGetAll: async function () {
-        const allTags = await db.Tag.findAll();
-        return allTags;
+        //全てのイベントに付いているタグを取得
+        const allEventTags = await db.EventTag.findAll(
+            {attributes: ['tagId']}
+        );
+
+        //イベントそれぞれのタグ情報を全て取得（重複あり）
+        let valiedTags = []
+        for (let i = 0 ; i < allEventTags.length ; i++) {
+            valiedTags[i] = await db.Tag.findOne(
+                { where: {
+                    id: allEventTags[i].tagId
+                  }
+                }
+            )
+        }
+        //重複するタグは削除
+        const notDuplicatedValiedTags = 
+        valiedTags.filter((element, index, self) => 
+            self.findIndex(e => 
+                e.id === element.id &&
+                e.name === element.name
+            ) === index
+        );
+
+        return notDuplicatedValiedTags;
     },
     findOrCreate: async function (res, tag) {
         let findTag = await db.Tag.findOrCreate({
