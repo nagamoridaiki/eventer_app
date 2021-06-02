@@ -34,40 +34,9 @@ module.exports = {
             holdDate.push(eventUseCase.getHoldDate(oneEventData));
         });
 
-        let box = []
-        for (let m = 0 ; m < eventAllData.length ; m++) {
-            box[m] = {
-                event : eventAllData[m],
-                datetime : holdDate[m]
-            }
-        }
-        
+        //日付ごとのイベント並び替え
+        let sortedEventByDateTime = eventUseCase.orderByDateTime(req, res, eventAllData, holdDate)
 
-        let filterHoldDate = holdDate.filter((element, index, self) =>
-            self.findIndex(e => 
-                e.Year === element.Year &&
-                e.Month === element.Month &&
-                e.Date === element.Date
-                ) === index
-            );
-
-       let dateTimeList = []
-       let displayEventData = []
-        for (let i = 0 ; i < filterHoldDate.length ; i++) {
-            let oneHoldDate = []
-            let oneDay = ""
-            for (let n = 0 ; n < box.length ; n++) {
-                if (filterHoldDate[i].Month == box[n].datetime.Month &&
-                    filterHoldDate[i].Date == box[n].datetime.Date) {
-                        oneHoldDate.push(box[n].event)
-                }
-            }
-            oneDay = String(filterHoldDate[i].Year)+"-"+String(filterHoldDate[i].Month)+"-"+String(filterHoldDate[i].Date)
-            
-            displayEventData[i] = oneHoldDate
-            dateTimeList[i] = oneDay
-            
-        }
         //お気に入りが数多く付けられている順番でイベントのidを取得する。
         let maxFavoriteEventId = await eventUseCase.eachEventFavoriteLength(res, eventAllData)
         
@@ -78,8 +47,8 @@ module.exports = {
             title: 'Event',
             login: req.session.user,
             holdDate: holdDate,
-            displayEventData: displayEventData,
-            dateTimeList: dateTimeList,
+            displayEventData: sortedEventByDateTime.EventData,
+            dateTimeList: sortedEventByDateTime.dateTime,
             Tags: tagAllData,
             maxFavoriteEvent: mostFavoriteEvent,
             secondFavoriteEvent: secondFavoriteEvent,
