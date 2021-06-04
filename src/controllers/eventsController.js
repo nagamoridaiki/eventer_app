@@ -16,6 +16,8 @@ const userUseCase = require('../usecase/users')
 const joinUseCase = require('../usecase/joins')
 const favoriteUseCase = require('../usecase/favorite')
 
+const env = require("dotenv").config({ path: "./.env" });
+const stripe = require("stripe")("sk_test_XXXXXXXXXXX");
 
 
 module.exports = {
@@ -286,6 +288,136 @@ module.exports = {
         await eventUseCase.fileUploadToS3(req, res, next, updateEventId);
         req.session.updateEventId = null;
         res.redirect('/events');
-    }
+    },
+    joinPayment: async(req, res, next) => {
+        const EventId = req.params.id;
+        const oneEvent = await eventUseCase.findOneEvent(EventId);
+        let isJoin = false;
+        let isFavorite = false;
+        const joinUser = oneEvent.User;
+        const favoriteUser = oneEvent.UserFavorite;
+
+        //あなたはそのイベントに参加予定か？
+        joinUser.forEach(element => {
+            if (element.id == req.session.user.id) {
+                isJoin = true;
+            }
+        });
+        //あなたはそのイベントをお気に入り登録しているか
+        favoriteUser.forEach(element => {
+            if (element.id == req.session.user.id) {
+                isFavorite = true;
+            }
+        });
+
+        //イベントの投稿者
+        const writter = await userUseCase.findOneUser(res, oneEvent.userId);
+        //開催日時情報
+        const holdDate = await eventUseCase.getHoldDate(oneEvent);
+
+        const data = {
+            title: 'events/show',
+            login: req.session.user,
+            event: oneEvent,
+            isJoin: isJoin,
+            isFavorite: isFavorite,
+            writter: writter,
+            err: null,
+            holdDate: holdDate,
+        }
+        res.render('layout', { layout_name: 'events/payment', data });
+    },
+    pay: async(req, res, next) => {
+
+        const { paymentMethodId, paymentIntentId, items, currency, useStripeSdk } = req.body;
+      
+        const total = calculateAmount(req.body.items);
+      
+        try {
+          let intent;
+          if (paymentMethodId) {
+              const request = {
+                  amount: total,
+                  currency: currency,
+                  payment_method: paymentMethodId,
+                  confirmation_method: "manual",
+                  confirm: true,
+                  use_stripe_sdk: useStripeSdk,
+              }
+      
+            intent = await stripe.paymentIntents.create(request);
+            
+          } else if (paymentIntentId) {
+              intent = await stripe.paymentIntents.confirm(paymentIntentId);
+          }
+      
+          const response = generateResponse(intent);
+            
+          res.send(response);
+      
+        } catch (e) {
+          const response = generateErrorResponse(e.message);
+      
+          res.status(500);
+          res.send(response);
+        }
+    },
 
 }
+
+function calculateAmount(items) {
+    let total = 0;
+    for (let i = 0; i < items.length; i++) {
+        const current = items[i].amount * items[i].quantity;
+        total += current;
+    }
+  
+    return total;
+  }
+  
+  function generateResponse(paymentIntent) {
+    let response = {
+        requiresAction: false,
+        clientSecret: "",
+        paymentIntentStatus : ""
+    }
+  
+    switch (paymentIntent.status) {
+        case "requires_action":
+            response.paymentIntentStatus = "requires_action";
+            break;
+        case "requires_source_action":
+            response.paymentIntentStatus = "requires_source_action";
+            response.requiresAction = true;
+            response.clientSecret = paymentIntent.client_secret;
+            break;
+        case "requires_payment_method":
+            response.paymentIntentStatus = "requires_payment_method";
+            break;
+        case "requires_source":
+            response.paymentIntentStatus = "requires_source";
+            response.error = {
+                messages : ["カードが拒否されました。別の決済手段をお試しください"]
+            }
+            break;
+        case "succeeded":
+            response.paymentIntentStatus = "succeeded";
+            response.clientSecret = paymentIntent.client_secret;
+            break;
+        default:
+            response.error = {
+                messages : ["システムエラーが発生しました"]
+            }
+            break;
+    }
+    return response;
+  }
+  
+function generateErrorResponse (error) {
+    return {
+        error : {
+        messages : [error]
+        }
+    }
+}
+  

@@ -52,6 +52,7 @@ module.exports = (sequelize, DataTypes) => {
         isPrivate: DataTypes.BOOLEAN,
         capacity: DataTypes.INTEGER,
         address: DataTypes.STRING,
+        price: DataTypes.INTEGER,
     }, {
         sequelize,
         modelName: 'Event',

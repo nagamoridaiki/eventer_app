@@ -27,5 +27,6 @@ router.get('/add', usersController.verifyJWT, eventsController.add);
 router.get('/userSearch', usersController.verifyJWT, usersController.search);
 router.post('/search', usersController.verifyJWT, usersController.searchUser);
 
+router.post("/v1/order/payment", usersController.verifyJWT, eventsController.pay);
 
 module.exports = router;
