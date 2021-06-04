@@ -12,6 +12,7 @@ const session = require('express-session');
 //const connectFlash = require("connect-flash");
 const layouts = require("express-ejs-layouts");
 const process = require('./config/process.js');
+const cors = require("cors");
 
 const app = express();
 
@@ -43,6 +44,7 @@ app.use(fileUpload());
 // body parserの設定
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(cors());
 
 app.use('/', indexRouter);
 app.use('/events', eventsRouter);

@@ -46,6 +46,7 @@ module.exports = {
             holdDate: params.holdDate,
             capacity: params.capacity,
             address: params.address,
+            price: params.price,
         }).catch((err) => {
             return err
         });
@@ -59,6 +60,7 @@ module.exports = {
             holdDate: params.holdDate,
             capacity: params.capacity,
             address: params.address,
+            price: params.price,
         }, {
             where: { id: EventId, }
         }).catch((err) => {

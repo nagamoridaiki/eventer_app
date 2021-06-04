@@ -86,6 +86,11 @@
             <div class="tab-content bg-light p-3">
                 <%= data.event.User.length %>/<%= data.event.capacity %>(定員)
             </div>
+            料金
+            <hr class="mt-0 mb-2">
+            <div class="tab-content bg-light p-3"  id="price">
+                <%= data.event.price %> 円
+            </div>
             お気に入りにされた数
             <hr class="mt-0 mb-2">
             <div class="tab-content bg-light p-3">
@@ -114,9 +119,7 @@
             <input class="btn btn-success" type="submit" value="参加する">
         </form>
     <% } %>
-    <%if (data.event.userId == data.login.id) {%>
-        <a href="/events/delete/<%= data.event.id %>" class="btn btn-primary">削除する</a>
-    <% } %>
+    <a href="/events/joinPayment/<%= data.event.id %>" class="btn btn-primary">参加登録</a>
 
 </body>
 

@@ -10,6 +10,7 @@ module.exports = {
                 holdDate: new Date(),
                 capacity: 10,
                 address: '東京都千代田区丸の内１丁目９',
+                price: 0,
                 createdAt: new Date(),
                 updatedAt: new Date()
             },
@@ -21,6 +22,7 @@ module.exports = {
               holdDate: new Date(),
               capacity: 20,
               address: '東京都新宿区新宿３丁目３８',
+              price: 0,
               createdAt: new Date(),
               updatedAt: new Date()
           },
