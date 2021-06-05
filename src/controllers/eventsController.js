@@ -187,6 +187,7 @@ module.exports = {
         let isFavorite = false;
         const joinUser = oneEvent.User;
         const favoriteUser = oneEvent.UserFavorite;
+        req.session.eventId = EventId
 
         //あなたはそのイベントに参加予定か？
         joinUser.forEach(element => {
