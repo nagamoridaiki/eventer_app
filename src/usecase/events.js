@@ -17,6 +17,8 @@ const AWS = require('aws-sdk');
 var awsCredFile = path.join(__dirname, '../config/AwsConfig.json');
 AWS.config.loadFromPath(awsCredFile);
 
+const env = require("dotenv").config({ path: "./.env" });
+const stripe = require("stripe")("sk_test_XXXXXXXXXXX");
 
 module.exports = {
     eventGetAll: async function () {
@@ -309,6 +311,40 @@ module.exports = {
         }
         return sortedEventByDateTime
     },
+    payEventPrice: async function (req, res) {
+        const { paymentMethodId, paymentIntentId, items, currency, useStripeSdk } = req.body;
+      
+        const total = calculateAmount(req.body.items);
+      
+        try {
+          let intent;
+          if (paymentMethodId) {
+              const request = {
+                  amount: total,
+                  currency: currency,
+                  payment_method: paymentMethodId,
+                  confirmation_method: "manual",
+                  confirm: true,
+                  use_stripe_sdk: useStripeSdk,
+              }
+      
+            intent = await stripe.paymentIntents.create(request);
+            
+          } else if (paymentIntentId) {
+              intent = await stripe.paymentIntents.confirm(paymentIntentId);
+          }
+      
+          const response = generateResponse(intent);
+            
+          return response;
+      
+        } catch (e) {
+          const response = generateErrorResponse(e.message);
+      
+          res.status(500);
+          res.send(response);
+        }
+    }
 
 }
 
@@ -327,4 +363,60 @@ function favariteLengthCount (res, allEventId, favoriteLengthList) {
         }
     }
     return mostFavoritedEventId
+}
+
+function calculateAmount(items) {
+    let total = 0;
+    for (let i = 0; i < items.length; i++) {
+        const current = items[i].amount * items[i].quantity;
+        total += current;
+    }
+  
+    return total;
+}
+  
+function generateResponse(paymentIntent) {
+    let response = {
+        requiresAction: false,
+        clientSecret: "",
+        paymentIntentStatus : ""
+    }
+  
+    switch (paymentIntent.status) {
+        case "requires_action":
+            response.paymentIntentStatus = "requires_action";
+            break;
+        case "requires_source_action":
+            response.paymentIntentStatus = "requires_source_action";
+            response.requiresAction = true;
+            response.clientSecret = paymentIntent.client_secret;
+            break;
+        case "requires_payment_method":
+            response.paymentIntentStatus = "requires_payment_method";
+            break;
+        case "requires_source":
+            response.paymentIntentStatus = "requires_source";
+            response.error = {
+                messages : ["カードが拒否されました。別の決済手段をお試しください"]
+            }
+            break;
+        case "succeeded":
+            response.paymentIntentStatus = "succeeded";
+            response.clientSecret = paymentIntent.client_secret;
+            break;
+        default:
+            response.error = {
+                messages : ["システムエラーが発生しました"]
+            }
+            break;
+    }
+    return response;
+}
+  
+function generateErrorResponse (error) {
+    return {
+        error : {
+        messages : [error]
+        }
+    }
 }

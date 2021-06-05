@@ -12,11 +12,11 @@ const process = require('../config/process.js');
 const moment = require('moment')
 
 module.exports = {
-    findOne: async function (params) {
+    findOne: async function (userId, eventId) {
         const joinData = await db.Join.findOne({
             where: {
-                userId: params.userId,
-                eventId: params.eventId,
+                userId: userId,
+                eventId: eventId,
             }
         });
         return joinData;
@@ -30,22 +30,22 @@ module.exports = {
         });
     },
     //参加をやめる
-    exit: async function (res, params) {
+    exit: async function (req, res, userId, eventId) {
         await db.Join.destroy({
             where: {
-                userId: params.userId,
-                eventId: params.eventId,
+                userId: userId,
+                eventId: eventId,
             }
         }).catch((err) => {
             res.render('layout', { layout_name: 'error', title: 'ERROR', msg: err });
         });
     },
     //参加表明する
-    entry: async function (res, params) {
+    entry: async function (req, res, userId, eventId) {
         //res.json(params)
         await db.Join.create({
-            userId: params.userId,
-            eventId: params.eventId,
+            userId: userId,
+            eventId: eventId,
         }).catch((err) => {
             res.render('layout', { layout_name: 'error', title: 'ERROR', msg: err });
         });

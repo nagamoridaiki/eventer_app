@@ -16,10 +16,6 @@ const userUseCase = require('../usecase/users')
 const joinUseCase = require('../usecase/joins')
 const favoriteUseCase = require('../usecase/favorite')
 
-const env = require("dotenv").config({ path: "./.env" });
-const stripe = require("stripe")("sk_test_XXXXXXXXXXX");
-
-
 module.exports = {
     index: async(req, res, next) => {
         //全イベント情報取得
@@ -231,12 +227,14 @@ module.exports = {
         res.redirect('/events');
     },
     join: async(req, res, next) => {
+        const userId = req.session.user.id
+        const eventId = req.session.eventId;
         //参加しているかを判定する。
-        const joinData = await joinUseCase.findOne(req.body);
+        const joinData = await joinUseCase.findOne(userId, eventId);
         //参加表明と参加辞退を切り替える
-        joinData ? await joinUseCase.exit(res, req.body) : await joinUseCase.entry(res, req.body)
+        joinData ? await joinUseCase.exit(req, res, userId, eventId) : await joinUseCase.entry(req, res, userId, eventId)
 
-        res.redirect('/events');
+        res.redirect('/events/show/'+ eventId);
     },
     favorite: async(req, res, next) => {
         //お気に入りかを判定する。
@@ -296,6 +294,7 @@ module.exports = {
         let isFavorite = false;
         const joinUser = oneEvent.User;
         const favoriteUser = oneEvent.UserFavorite;
+        req.session.eventId = EventId
 
         //あなたはそのイベントに参加予定か？
         joinUser.forEach(element => {
@@ -328,96 +327,10 @@ module.exports = {
         res.render('layout', { layout_name: 'events/payment', data });
     },
     pay: async(req, res, next) => {
-
-        const { paymentMethodId, paymentIntentId, items, currency, useStripeSdk } = req.body;
-      
-        const total = calculateAmount(req.body.items);
-      
-        try {
-          let intent;
-          if (paymentMethodId) {
-              const request = {
-                  amount: total,
-                  currency: currency,
-                  payment_method: paymentMethodId,
-                  confirmation_method: "manual",
-                  confirm: true,
-                  use_stripe_sdk: useStripeSdk,
-              }
-      
-            intent = await stripe.paymentIntents.create(request);
-            
-          } else if (paymentIntentId) {
-              intent = await stripe.paymentIntents.confirm(paymentIntentId);
-          }
-      
-          const response = generateResponse(intent);
-            
-          res.send(response);
-      
-        } catch (e) {
-          const response = generateErrorResponse(e.message);
-      
-          res.status(500);
-          res.send(response);
-        }
+        const response = await eventUseCase.payEventPrice(req, res);
+        res.send(response);
     },
 
 }
 
-function calculateAmount(items) {
-    let total = 0;
-    for (let i = 0; i < items.length; i++) {
-        const current = items[i].amount * items[i].quantity;
-        total += current;
-    }
-  
-    return total;
-  }
-  
-  function generateResponse(paymentIntent) {
-    let response = {
-        requiresAction: false,
-        clientSecret: "",
-        paymentIntentStatus : ""
-    }
-  
-    switch (paymentIntent.status) {
-        case "requires_action":
-            response.paymentIntentStatus = "requires_action";
-            break;
-        case "requires_source_action":
-            response.paymentIntentStatus = "requires_source_action";
-            response.requiresAction = true;
-            response.clientSecret = paymentIntent.client_secret;
-            break;
-        case "requires_payment_method":
-            response.paymentIntentStatus = "requires_payment_method";
-            break;
-        case "requires_source":
-            response.paymentIntentStatus = "requires_source";
-            response.error = {
-                messages : ["カードが拒否されました。別の決済手段をお試しください"]
-            }
-            break;
-        case "succeeded":
-            response.paymentIntentStatus = "succeeded";
-            response.clientSecret = paymentIntent.client_secret;
-            break;
-        default:
-            response.error = {
-                messages : ["システムエラーが発生しました"]
-            }
-            break;
-    }
-    return response;
-  }
-  
-function generateErrorResponse (error) {
-    return {
-        error : {
-        messages : [error]
-        }
-    }
-}
   
