@@ -30,6 +30,25 @@ module.exports = {
 
         return allArticle;
     },
+    getApdatedAt: function (article){
+        let Year = moment(article.updatedAt).format('Y');
+        let Month = moment(article.updatedAt).format('M');
+        let Date = moment(article.updatedAt).format('D');
+        let Time = moment(article.updatedAt).format('HH:mm');
+        if (Month.length == 1) {
+            Month = "0" + Month
+        }
+        if (Date.length == 1) {
+            Date = "0" + Date
+        }
+        const updatedAt = {
+            Year: Year,
+            Month: Month,
+            Date: Date,
+            Time: Time
+        };
+        return updatedAt;
+    },
     articleCreate: async function (ArticleId, params) {
         const newArticle = await db.Article.create({
             userId: ArticleId,
@@ -48,6 +67,12 @@ module.exports = {
             return err
         });
         return newArticle;
+    },
+    delete: async function (articleId){
+        await db.Article.destroy({
+            where: { id: articleId }
+        })
+        return articleId;
     },
     fileUpload: async function (req, res, next, newArticleId) {
         try {

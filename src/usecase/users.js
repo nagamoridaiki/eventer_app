@@ -232,17 +232,21 @@ module.exports = {
         });
         return allMessages;
     },
-    isArticleWrittenByFollower: async function (res, articleAllData, follow) {
+    isArticleWrittenByFollower: async function (res, articleAllData, user) {
         //フォローした人の記事かどうか
         let articleList = [];
-        //フォローしてる人が
-        for (let i = 0 ; i < follow.length ; i++) {
-            //その投稿を書いた人であれば
-            for (let m = 0 ; m < articleAllData.length ; m++) {
+
+        for (let m = 0 ; m < articleAllData.length ; m++) {
+            //フォローしてる人が書いた場合
+            for (let i = 0 ; i < user.follower.length ; i++) {
                 //フォローした人のidと投稿した人のidが一致すれば
-                if (follow[i].id == articleAllData[m].userId) {
+                if (user.follower[i].id == articleAllData[m].userId) {
                     articleList.push(articleAllData[m])
                 }
+            }
+            //ログインユーザーが書いたつぶやきも対象
+            if (user.id == articleAllData[m].userId) {
+                articleList.push(articleAllData[m])
             }
         }
         return articleList;

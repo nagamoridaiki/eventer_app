@@ -28,17 +28,26 @@ module.exports = {
         //ログインしてるユーザー
         let user = await userUseCase.findOneUser(res, req.session.user.id);
         //フォローした人の記事かどうか
-        let articleList = await userUseCase.isArticleWrittenByFollower(res, articleAllData, user.follower)
+        let articleList = await userUseCase.isArticleWrittenByFollower(res, articleAllData, user)
         //フォローした人の記事にいいねしているか
         let isLike = await userUseCase.isLikedToArticle(req, articleList)
+
+        let updatedDate = [];
+        articleList.forEach(function(article) {
+            //console.log(article.updatedAt)
+            //開催日時情報
+            updatedDate.push(articlesUseCase.getApdatedAt(article));
+        });
 
         const data = {
             title: '投稿',
             login: req.session.user,
             content: {
                 article: articleList,
-                isLike: isLike
+                isLike: isLike,
+                updatedDate: updatedDate,
             },
+            
         }
         res.render('layout', { layout_name: 'articles/articleList', data });
     },
@@ -56,6 +65,10 @@ module.exports = {
         req.session.newArticle = newArticleData.id
         next()
     },
+    delete: async(req, res, next) => {
+        await articlesUseCase.delete(req.params.id);
+        res.redirect('/articles');
+    },
     like: async(req, res, next) => {
 
         //いいねしているかを判定する。
@@ -72,6 +85,10 @@ module.exports = {
         res.redirect('/articles');
     },
     imageUpload: async(req, res, next) => {
+        if (!req.files) {
+            req.session.newArticle = null;
+            res.redirect('/articles')
+        }
         const newArticleId = req.session.newArticle
         await articlesUseCase.fileUpload(req, res, next, newArticleId);
 
