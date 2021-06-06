@@ -32,20 +32,33 @@ module.exports = {
         //フォローした人の記事にいいねしているか
         let isLike = await userUseCase.isLikedToArticle(req, articleList)
 
-        let updatedDate = [];
-        articleList.forEach(function(article) {
-            //console.log(article.updatedAt)
-            //開催日時情報
-            updatedDate.push(articlesUseCase.getApdatedAt(article));
-        });
+        let articleUpdatedDate = [];
+        let commentList = []
+        let commentUpdatedAt = []
+        for (let i = 0 ; i < articleList.length ; i++) {
+            //記事更新日時表示
+            articleUpdatedDate.push(articlesUseCase.getApdatedAt(articleList[i]));
+            //各つぶやきに対するコメント
+            let comments = await articlesUseCase.getCommentsById(articleList[i].id)
+            let commentUpdatedDate = [];
+
+            for (let n = 0 ; n < comments.length ; n++) {
+                //コメント更新日時表示
+                commentUpdatedDate.push(articlesUseCase.getApdatedAt(comments[n]));
+            }
+            commentList[i] = comments
+            commentUpdatedAt[i] = commentUpdatedDate
+        }
 
         const data = {
             title: '投稿',
             login: req.session.user,
             content: {
                 article: articleList,
+                updatedDate: articleUpdatedDate,
+                comment: commentList,
+                commentUpdated: commentUpdatedAt,
                 isLike: isLike,
-                updatedDate: updatedDate,
             },
             
         }

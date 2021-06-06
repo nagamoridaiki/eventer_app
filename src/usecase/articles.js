@@ -23,7 +23,7 @@ module.exports = {
             {
                 include: ['Comment', 'User', 'LikedUser'],
                 order: [
-                    ['id', 'DESC']
+                    ['updatedAt', 'DESC']
                 ],
             }
         )
@@ -146,5 +146,19 @@ module.exports = {
         });
         return sendedMessage;
     },
+    getCommentsById: async function (articleId) {
+        let comments = await db.Comment.findAll({
+            include: ['User', 'Article'],
+            where: {
+                articleId: articleId,
+            },
+            order: [
+                ['updatedAt', 'DESC']
+            ],
+        }).catch(err => {
+            res.render('layout', { layout_name: 'error', title: 'ERROR', msg: err });
+        });
+        return comments;
+    }
 
 }

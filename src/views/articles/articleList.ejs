@@ -57,10 +57,13 @@
                                 <img src="https://eventernagamori.s3-ap-northeast-1.amazonaws.com/fixedImage/noperson.jpg" width="5%" height="5%" class="flex-row-reverse rounded-circle"/>
                             <% } %>
                             <p class="card-text"><a href="/user/<%= data.content.article[i].User.id %>"><%= data.content.article[i].User.name %></a></p>
-                            <p class="card-text"><%= data.content.article[i].detail %></p>
+                            <h5><%= data.content.article[i].detail %></h5>
                             <%if (data.content.article[i].image != null) {%>
                                 <img src="/img/uploard_articles/<%= data.content.article[i].image %>" width="30%" height="30%" class="flex-row-reverse"/>
                             <% } %>
+                            <br>
+                            <!-- 更新日時表示 -->
+                            <div style="float:right"><%= data.content.updatedDate[i].Year %>年<%= data.content.updatedDate[i].Month %>月<%= data.content.updatedDate[i].Date %>日 <%= data.content.updatedDate[i].Time  %> </div> 
                             <br>
                             <%if (data.content.isLike[i] == 'doLike') {%>
                                 <form method="post" action="/articles/Like">
@@ -79,20 +82,36 @@
                                 </form>
                             <% } %>
                             <!-- コメントする -->
-                            <a href="#comment_<%= data.content.article[i].id %>" data-toggle="modal"><i class="far fa-comment"></i></a><span> <%= data.content.article[i].Comment.length %>件</span>
-                            <br>
-                            <!-- 更新日時表示 -->
-                            <div style="float:right"><%= data.content.updatedDate[i].Year %>年<%= data.content.updatedDate[i].Month %>月<%= data.content.updatedDate[i].Date %>日 <%= data.content.updatedDate[i].Time  %> </div> 
-                            <br>
-                            <!-- コメント一覧 -->
-                            <% if (data.content.article[i].Comment != null) { %>
-                                <% for(let n in data.content.article[i].Comment) { %>
-                                    <h6 class="card-title"><%= data.content.article[i].Comment[n].body %></h6>
-                                    <p class="card-text"><%= data.content.article[i].Comment[n].updatedAt %></p>
+                            <div id="commentFormDisplayFlg" data-toggle="modal" onclick="document.getElementById('commentPost_<%= data.content.article[i].id %>').style.display = 'block';"><i class="far fa-comment" style="color:mediumturquoise;"></i><span> <%= data.content.article[i].Comment.length %>件</span></div>
+                            <!-- コメントを書く -->
+                            <div id="commentPost_<%= data.content.article[i].id %>"  style="display: none;">
+                                <form method="post" action="/articles/commentAdd">
+                                    <input type="hidden" name="articleId" value="<%= data.content.article[i].id %>">
+                                    <textarea type="text" name="body" class="form-control" rows="1" required></textarea>
+                                    <button class="btn btn-primary" type="submit"><i class="fas fa-location-arrow"></i></button>
+                                </form>
+                                <br>
+                                <!-- コメント一覧 -->
+                                <% if (data.content.comment[i].length > 0) { %>
+                                    <h5>Comments</h5>
+                                    <% for(let n in data.content.comment[i]) { %>
+                                        <hr class="mt-0 mb-2">
+
+                                        <%if (data.content.comment[i][n].User.image != null) {%>
+                                            <img src="https://eventernagamori.s3-ap-northeast-1.amazonaws.com/users/<%= data.content.comment[i][n].User.image %>" width="5%" height="5%" class="flex-row-reverse rounded-circle"/>
+                                        <% } else { %>
+                                            <img src="https://eventernagamori.s3-ap-northeast-1.amazonaws.com/fixedImage/noperson.jpg" width="5%" height="5%" class="flex-row-reverse rounded-circle"/>
+                                        <% } %>
+            
+                                        <a href="/user/<%= data.content.comment[i][n].User.id %>"><h6 class="card-title"><%= data.content.comment[i][n].User.name %></h6></a>
+                                        <h6 class="card-title"><%= data.content.comment[i][n].body %></h6>
+                                        <p class="card-text"><%= data.content.commentUpdated[i][n].Year %>年<%= data.content.commentUpdated[i][n].Month %>月<%= data.content.commentUpdated[i][n].Date %>日 <%= data.content.commentUpdated[i][n].Time  %></p>
+                                    <% } %>
                                 <% } %>
-                            <% } %>
+                            </div>
                         </div>
                     </div>
+                    <br><br>
                 <% } %>
             </div>
             <div class="col-5">
@@ -111,35 +130,6 @@
                 </form>
             </div>
         </div>
-
-        <% for(let i in data.content.article) { %>
-            <div class="modal fade" id="comment_<%= data.content.article[i].id %>" tabindex="-1">
-                <div class="modal-dialog modal-dialog-centered modal-lg">
-                    <div class="modal-content">
-                        <div class="modal-body">
-                            <button class="close" data-dismiss="modal"><span>&times;</span></button>
-                            <!-- コメントを書く -->
-                            <form method="post" action="/articles/commentAdd">
-                                <input type="hidden" name="articleId" value="<%= data.content.article[i].id %>">
-                                <div class="form-group mb-4">
-                                    <label for="B_address">コメント</label>
-                                    <textarea type="text" name="body" class="form-control" rows="5"></textarea>
-                                    <ul class="text-danger">
-                                        <% if (data.err!=null) { for (let i in data.err.get("body")) { %>
-                                            <li>
-                                                <%= data.err.get("body")[i].message %>
-                                            </li>
-                                        <% }} %>
-                                    </ul>
-                                <div>
-                                <input type="submit" value="送信" class="btn btn-primary col-2">
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div><br>
-        <% } %>
     </div>
 
 <script src="/src/public/javascripts/jquery-3.3.1.slim.min.js"></script>
