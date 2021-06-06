@@ -30,80 +30,106 @@
             </div>
         </div>  
         <br>
-         
-        <% for(let i in data.content.article) { %>
-        <div class="card">
-            <div class="card-body"> 
-            <div style="float:right"><%= data.content.article[i].updatedAt %></div>          
-            <%if (data.content.article[i].User.image != null) {%>
-                <img src="https://eventernagamori.s3-ap-northeast-1.amazonaws.com/users/<%= data.content.article[i].User.image %>" width="5%" height="5%" class="flex-row-reverse rounded-circle"/>
-            <% } else { %>
-                <img src="https://eventernagamori.s3-ap-northeast-1.amazonaws.com/fixedImage/noperson.jpg" width="5%" height="5%" class="flex-row-reverse rounded-circle"/>
-            <% } %>
-            <p class="card-text"><a href="/user/<%= data.content.article[i].User.id %>"><%= data.content.article[i].User.name %></a></p>
-            <p class="card-text"><%= data.content.article[i].detail %></p>
-            <%if (data.content.article[i].image != null) {%>
-                <img src="/img/uploard_articles/<%= data.content.article[i].image %>" width="30%" height="30%" class="flex-row-reverse"/>
-            <% } %>
-            <br>
-            <%if (data.content.isLike[i] == 'doLike') {%>
-                <form method="post" action="/articles/Like">
-                    <input type="hidden" name="userId" value="<%= data.login.id %>">
-                    <input type="hidden" name="articleId" value="<%= data.content.article[i].id %>">
-                    <button class="" style="color: orangered; border:none; background-color:white;" type="submit"><span class="fa fa-heart"></span></button>
-                    <%= data.content.article[i].LikedUser.length %>
-                </form>
-            <% } %>
-            <%if (data.content.isLike[i] == 'yetLike') {%>
-                <form method="post" action="/articles/Like">
-                    <input type="hidden" name="userId" value="<%= data.login.id %>">
-                    <input type="hidden" name="articleId" value="<%= data.content.article[i].id %>">
-                    <button style="border:none; background-color:white;" type="submit"><span class="fa fa-heart"></span></button>
-                    <%= data.content.article[i].LikedUser.length %>
-                </form>
-            <% } %>
-            <!-- コメントする -->
-            <a href="#comment_<%= data.content.article[i].id %>" data-toggle="modal"><i class="far fa-comment"></i></a><span> <%= data.content.article[i].Comment.length %>件</span>
-            <br>
-            <br>
-            <!-- コメント一覧 -->
-            <% if (data.content.article[i].Comment != null) { %>
-                <% for(let n in data.content.article[i].Comment) { %>
-                    <h6 class="card-title"><%= data.content.article[i].Comment[n].body %></h6>
-                    <p class="card-text"><%= data.content.article[i].Comment[n].updatedAt %></p>
-                <% } %>
-            <% } %>
-            
-            <div class="modal fade" id="comment_<%= data.content.article[i].id %>" tabindex="-1">
-                <div class="modal-dialog modal-dialog-centered modal-lg">
-                  <div class="modal-content">
-                    <div class="modal-body">
-                      <button class="close" data-dismiss="modal"><span>&times;</span></button>
-                        <!-- コメントを書く -->
-                        <form method="post" action="/articles/commentAdd">
-                            <input type="hidden" name="articleId" value="<%= data.content.article[i].id %>">
-                            <div class="form-group mb-4">
-                            <label for="B_address">コメント</label>
-                            <textarea type="text" name="body" class="form-control" rows="5"></textarea>
-                            <ul class="text-danger">
-                                <% if (data.err!=null) { for (let i in data.err.get("body")) { %>
-                                    <li>
-                                        <%= data.err.get("body")[i].message %>
-                                    </li>
-                                <% }} %>
-                            </ul>
-                            <div>
-                                <input type="submit" value="送信" class="btn btn-primary col-2">
-                            </div>
-                        </form>
-                    </div>
-                  </div>
-                </div>
-            </div>
+        <div class="row">
+            <div class="col-7">
+                <% for(let i in data.content.article) { %>
+                    <div class="card">
+                        <div class="card-body">
+                            <!-- edit delete -->
+                            <%if (data.content.article[i].userId == data.login.id) {%>
+                                <div class="ml-auto card-text" style="float: right;">
+                                    <div class="dropdown">
+                                      <a data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                      </a>
+                                      <div class="dropdown-menu dropdown-menu-right">
+                                        <a class="dropdown-item" href="/articles/delete/<%= data.content.article[i].id %>">
+                                            <i class="fas fa-trash-alt mr-1"></i>つぶやきを削除
+                                        </a>
+                                      </div>
+                                    </div>
+                                </div>
+                            <% } %>
 
+                            <%if (data.content.article[i].User.image != null) {%>
+                                <img src="https://eventernagamori.s3-ap-northeast-1.amazonaws.com/users/<%= data.content.article[i].User.image %>" width="5%" height="5%" class="flex-row-reverse rounded-circle"/>
+                            <% } else { %>
+                                <img src="https://eventernagamori.s3-ap-northeast-1.amazonaws.com/fixedImage/noperson.jpg" width="5%" height="5%" class="flex-row-reverse rounded-circle"/>
+                            <% } %>
+                            <p class="card-text"><a href="/user/<%= data.content.article[i].User.id %>"><%= data.content.article[i].User.name %></a></p>
+                            <h5><%= data.content.article[i].detail %></h5>
+                            <%if (data.content.article[i].image != null) {%>
+                                <img src="/img/uploard_articles/<%= data.content.article[i].image %>" width="30%" height="30%" class="flex-row-reverse"/>
+                            <% } %>
+                            <br>
+                            <!-- 更新日時表示 -->
+                            <div style="float:right"><%= data.content.updatedDate[i].Year %>年<%= data.content.updatedDate[i].Month %>月<%= data.content.updatedDate[i].Date %>日 <%= data.content.updatedDate[i].Time  %> </div> 
+                            <br>
+                            <%if (data.content.isLike[i] == 'doLike') {%>
+                                <form method="post" action="/articles/Like">
+                                    <input type="hidden" name="userId" value="<%= data.login.id %>">
+                                    <input type="hidden" name="articleId" value="<%= data.content.article[i].id %>">
+                                    <button class="" style="color: orangered; border:none; background-color:white;" type="submit"><span class="fa fa-heart"></span></button>
+                                    <%= data.content.article[i].LikedUser.length %>
+                                </form>
+                            <% } %>
+                            <%if (data.content.isLike[i] == 'yetLike') {%>
+                                <form method="post" action="/articles/Like">
+                                    <input type="hidden" name="userId" value="<%= data.login.id %>">
+                                    <input type="hidden" name="articleId" value="<%= data.content.article[i].id %>">
+                                    <button style="border:none; background-color:white;" type="submit"><span class="fa fa-heart"></span></button>
+                                    <%= data.content.article[i].LikedUser.length %>
+                                </form>
+                            <% } %>
+                            <!-- コメントする -->
+                            <div id="commentFormDisplayFlg" data-toggle="modal" onclick="document.getElementById('commentPost_<%= data.content.article[i].id %>').style.display = 'block';"><i class="far fa-comment" style="color:mediumturquoise;"></i><span> <%= data.content.article[i].Comment.length %>件</span></div>
+                            <!-- コメントを書く -->
+                            <div id="commentPost_<%= data.content.article[i].id %>"  style="display: none;">
+                                <form method="post" action="/articles/commentAdd">
+                                    <input type="hidden" name="articleId" value="<%= data.content.article[i].id %>">
+                                    <textarea type="text" name="body" class="form-control" rows="1" required></textarea>
+                                    <button class="btn btn-primary" type="submit"><i class="fas fa-location-arrow"></i></button>
+                                </form>
+                                <br>
+                                <!-- コメント一覧 -->
+                                <% if (data.content.comment[i].length > 0) { %>
+                                    <h5>Comments</h5>
+                                    <% for(let n in data.content.comment[i]) { %>
+                                        <hr class="mt-0 mb-2">
+
+                                        <%if (data.content.comment[i][n].User.image != null) {%>
+                                            <img src="https://eventernagamori.s3-ap-northeast-1.amazonaws.com/users/<%= data.content.comment[i][n].User.image %>" width="5%" height="5%" class="flex-row-reverse rounded-circle"/>
+                                        <% } else { %>
+                                            <img src="https://eventernagamori.s3-ap-northeast-1.amazonaws.com/fixedImage/noperson.jpg" width="5%" height="5%" class="flex-row-reverse rounded-circle"/>
+                                        <% } %>
+            
+                                        <a href="/user/<%= data.content.comment[i][n].User.id %>"><h6 class="card-title"><%= data.content.comment[i][n].User.name %></h6></a>
+                                        <h6 class="card-title"><%= data.content.comment[i][n].body %></h6>
+                                        <p class="card-text"><%= data.content.commentUpdated[i][n].Year %>年<%= data.content.commentUpdated[i][n].Month %>月<%= data.content.commentUpdated[i][n].Date %>日 <%= data.content.commentUpdated[i][n].Time  %></p>
+                                    <% } %>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                    <br><br>
+                <% } %>
             </div>
-        </div><br>
-        <% } %>
+            <div class="col-5">
+                <form method="post" action="/articles/add" enctype="multipart/form-data">
+                    <div class="form-group mb-4">
+                    <label for="B_address">つぶやく</label>
+                    <textarea type="text" name="detail" class="form-control" rows="10"></textarea>
+                    <button class="btn btn-primary" type="submit"><i class="fas fa-location-arrow"></i></button>
+                    <ul class="text-danger">
+                        <% if (data.err!=null) { for (let i in data.err.get("detail")) { %>
+                            <li>
+                                <%= data.err.get("detail")[i].message %>
+                            </li>
+                        <% }} %>
+                    </ul>
+                </form>
+            </div>
+        </div>
     </div>
 
 <script src="/src/public/javascripts/jquery-3.3.1.slim.min.js"></script>

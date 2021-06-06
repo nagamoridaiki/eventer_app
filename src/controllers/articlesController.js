@@ -28,17 +28,39 @@ module.exports = {
         //ログインしてるユーザー
         let user = await userUseCase.findOneUser(res, req.session.user.id);
         //フォローした人の記事かどうか
-        let articleList = await userUseCase.isArticleWrittenByFollower(res, articleAllData, user.follower)
+        let articleList = await userUseCase.isArticleWrittenByFollower(res, articleAllData, user)
         //フォローした人の記事にいいねしているか
         let isLike = await userUseCase.isLikedToArticle(req, articleList)
+
+        let articleUpdatedDate = [];
+        let commentList = []
+        let commentUpdatedAt = []
+        for (let i = 0 ; i < articleList.length ; i++) {
+            //記事更新日時表示
+            articleUpdatedDate.push(articlesUseCase.getApdatedAt(articleList[i]));
+            //各つぶやきに対するコメント
+            let comments = await articlesUseCase.getCommentsById(articleList[i].id)
+            let commentUpdatedDate = [];
+
+            for (let n = 0 ; n < comments.length ; n++) {
+                //コメント更新日時表示
+                commentUpdatedDate.push(articlesUseCase.getApdatedAt(comments[n]));
+            }
+            commentList[i] = comments
+            commentUpdatedAt[i] = commentUpdatedDate
+        }
 
         const data = {
             title: '投稿',
             login: req.session.user,
             content: {
                 article: articleList,
-                isLike: isLike
+                updatedDate: articleUpdatedDate,
+                comment: commentList,
+                commentUpdated: commentUpdatedAt,
+                isLike: isLike,
             },
+            
         }
         res.render('layout', { layout_name: 'articles/articleList', data });
     },
@@ -56,6 +78,10 @@ module.exports = {
         req.session.newArticle = newArticleData.id
         next()
     },
+    delete: async(req, res, next) => {
+        await articlesUseCase.delete(req.params.id);
+        res.redirect('/articles');
+    },
     like: async(req, res, next) => {
 
         //いいねしているかを判定する。
@@ -72,6 +98,10 @@ module.exports = {
         res.redirect('/articles');
     },
     imageUpload: async(req, res, next) => {
+        if (!req.files) {
+            req.session.newArticle = null;
+            res.redirect('/articles')
+        }
         const newArticleId = req.session.newArticle
         await articlesUseCase.fileUpload(req, res, next, newArticleId);
 

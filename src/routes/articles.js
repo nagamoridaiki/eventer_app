@@ -10,6 +10,7 @@ const articlesController = require('../controllers/articlesController');
 router.get('/add', usersController.verifyJWT, articlesController.add);
 router.post('/add', usersController.verifyJWT, articlesController.create, articlesController.imageUpload);
 router.get('/', usersController.verifyJWT, articlesController.index);
+router.get('/delete/:id', usersController.verifyJWT, articlesController.delete);
 router.post('/like', usersController.verifyJWT, articlesController.like);
 router.post('/commentAdd', usersController.verifyJWT, articlesController.commentAdd);
 router.post('/messageSend', usersController.verifyJWT, articlesController.messageSend);

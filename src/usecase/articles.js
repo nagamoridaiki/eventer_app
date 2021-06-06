@@ -23,12 +23,31 @@ module.exports = {
             {
                 include: ['Comment', 'User', 'LikedUser'],
                 order: [
-                    ['id', 'DESC']
+                    ['updatedAt', 'DESC']
                 ],
             }
         )
 
         return allArticle;
+    },
+    getApdatedAt: function (article){
+        let Year = moment(article.updatedAt).format('Y');
+        let Month = moment(article.updatedAt).format('M');
+        let Date = moment(article.updatedAt).format('D');
+        let Time = moment(article.updatedAt).format('HH:mm');
+        if (Month.length == 1) {
+            Month = "0" + Month
+        }
+        if (Date.length == 1) {
+            Date = "0" + Date
+        }
+        const updatedAt = {
+            Year: Year,
+            Month: Month,
+            Date: Date,
+            Time: Time
+        };
+        return updatedAt;
     },
     articleCreate: async function (ArticleId, params) {
         const newArticle = await db.Article.create({
@@ -48,6 +67,12 @@ module.exports = {
             return err
         });
         return newArticle;
+    },
+    delete: async function (articleId){
+        await db.Article.destroy({
+            where: { id: articleId }
+        })
+        return articleId;
     },
     fileUpload: async function (req, res, next, newArticleId) {
         try {
@@ -121,5 +146,19 @@ module.exports = {
         });
         return sendedMessage;
     },
+    getCommentsById: async function (articleId) {
+        let comments = await db.Comment.findAll({
+            include: ['User', 'Article'],
+            where: {
+                articleId: articleId,
+            },
+            order: [
+                ['updatedAt', 'DESC']
+            ],
+        }).catch(err => {
+            res.render('layout', { layout_name: 'error', title: 'ERROR', msg: err });
+        });
+        return comments;
+    }
 
 }
