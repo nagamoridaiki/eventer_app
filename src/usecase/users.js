@@ -200,7 +200,7 @@ module.exports = {
                 }
             }
         }
-        return isLike
+        return yourLikeFlg
     },
     getOthersUsers: async function (req, users) {
         let othersUsers = []
