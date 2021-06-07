@@ -22,24 +22,24 @@ module.exports = {
         const eventAllData = await eventUseCase.eventGetAll();
         //全タグ情報取得
         const tagAllData = await tagUseCase.tagGetAll();
-        //res.json(eventAllData)
-        const sort_target = 'holdDate';
-        eventAllData.sort((a, b) => a[sort_target] - b[sort_target]);
+       
+        const sortTarget = 'holdDate';
+        eventAllData.sort((a, b) => a[sortTarget] - b[sortTarget]);
 
         let holdDate = [];
-        eventAllData.forEach(function(oneEventData) {
+        eventAllData.forEach(function(event) {
             //開催日時情報
-            holdDate.push(eventUseCase.getHoldDate(oneEventData));
+            holdDate.push(eventUseCase.getHoldDate(event));
         });
 
         //日付ごとのイベント並び替え
         let sortedEventByDateTime = eventUseCase.orderByDateTime(req, res, eventAllData, holdDate)
 
         //お気に入りが数多く付けられている順番でイベントのidを取得する。
-        let maxFavoriteEventId = await eventUseCase.eachEventFavoriteLength(res, eventAllData)
+        let mostFavoriteEventId = await eventUseCase.eachEventFavoriteLength(res, eventAllData)
         
-        const mostFavoriteEvent = await eventUseCase.findOneEvent(maxFavoriteEventId[0]);
-        const secondFavoriteEvent = await eventUseCase.findOneEvent(maxFavoriteEventId[1]);
+        const mostFavoriteEvent = await eventUseCase.findOneEvent(mostFavoriteEventId[0]);
+        const secondlyFavoriteEvent = await eventUseCase.findOneEvent(mostFavoriteEventId[1]);
         
         const data = {
             title: 'Event',
@@ -49,7 +49,7 @@ module.exports = {
             dateTimeList: sortedEventByDateTime.dateTime,
             Tags: tagAllData,
             maxFavoriteEvent: mostFavoriteEvent,
-            secondFavoriteEvent: secondFavoriteEvent,
+            secondFavoriteEvent: secondlyFavoriteEvent,
         }
         res.render('layout', { layout_name: 'events/dateTimeList', data });
         
@@ -57,7 +57,7 @@ module.exports = {
     search: async(req, res, next) => {
         const TagName = req.params.TagName;
         const eventAllData = await eventUseCase.eventGetAll();
-        let serchResultEvent = [];
+        let searchEventResult = [];
         let holdDate = [];
         //各イベントそれぞれの
         eventAllData.forEach((event) => {
@@ -67,7 +67,7 @@ module.exports = {
             event.Tag.forEach((eventtags) => {
                 //各イベントについているタグのいずれかが、探したいタグと一致していれば
                 if (eventtags.name == TagName) {
-                    serchResultEvent.push(event)
+                    searchEventResult.push(event)
                 }
             })
         });
@@ -76,7 +76,7 @@ module.exports = {
             title: TagName,
             login: req.session.user,
             content: {
-                event: serchResultEvent,
+                event: searchEventResult,
                 holdDate: holdDate,
             },
             Tags: tagAllData,
@@ -91,21 +91,21 @@ module.exports = {
         const tagAllData = await tagUseCase.tagGetAll();
 
         let holdDate = [];
-        let historyEventList = [];
+        let eventHistoryList = [];
         let history = oneUser.Event;
 
         for (let i = 0 ; i < history.length ; i++) {
             //開催日時情報
             holdDate.push(eventUseCase.getHoldDate(history[i])); 
             let event = await eventUseCase.findOneEvent(history[i].id)
-            historyEventList[i] = event
+            eventHistoryList[i] = event
         }
 
         const data = {
             title: 'History',
             login: req.session.user,
             content: {
-                event: historyEventList,
+                event: eventHistoryList,
                 holdDate: holdDate,
             },
             Tags: tagAllData,
@@ -163,7 +163,7 @@ module.exports = {
     },
     tagUpdate: async(req, res, next) => {
         const EventId = req.params.id;
-        const findEvent = await eventUseCase.findOneEvent(EventId);
+        const discoveredEvent = await eventUseCase.findOneEvent(EventId);
         //古いイベントタグ紐付け情報をいったん消す
         await tagUseCase.eventTagDestroy(res, EventId);
         //タグ作成およびイベントとの紐付け
@@ -174,29 +174,29 @@ module.exports = {
         //tagの数だけ繰り返す
         tags.forEach(async function(tag, key ) {
             //入力したタグをDBから探し、なければ作成する。
-            let findTag = await tagUseCase.findOrCreate(res, tag);
+            let discoveredTag = await tagUseCase.findOrCreate(res, tag);
             //タグをイベントと紐付け
-            tagUseCase.eventTagCreate(res, findEvent, findTag);
+            tagUseCase.eventTagCreate(res, discoveredEvent, discoveredTag);
         });
         next()
     },
     show: async(req, res, next) => {
         const EventId = req.params.id;
         const oneEvent = await eventUseCase.findOneEvent(EventId);
-        let isJoin = false;
+        let isJoining = false;
         let isFavorite = false;
-        const joinUser = oneEvent.User;
-        const favoriteUser = oneEvent.UserFavorite;
+        const joininigUsers = oneEvent.User;
+        const favoriteLength = oneEvent.UserFavorite;
         req.session.eventId = EventId
 
         //あなたはそのイベントに参加予定か？
-        joinUser.forEach(element => {
+        joininigUsers.forEach(element => {
             if (element.id == req.session.user.id) {
-                isJoin = true;
+                isJoining = true;
             }
         });
         //あなたはそのイベントをお気に入り登録しているか
-        favoriteUser.forEach(element => {
+        favoriteLength.forEach(element => {
             if (element.id == req.session.user.id) {
                 isFavorite = true;
             }
@@ -211,7 +211,7 @@ module.exports = {
             title: 'events/show',
             login: req.session.user,
             event: oneEvent,
-            isJoin: isJoin,
+            isJoin: isJoining,
             isFavorite: isFavorite,
             writter: writter,
             err: null,
@@ -231,9 +231,9 @@ module.exports = {
         const userId = req.session.user.id
         const eventId = req.session.eventId;
         //参加しているかを判定する。
-        const joinData = await joinUseCase.findOne(userId, eventId);
+        const joiningData = await joinUseCase.findOne(userId, eventId);
         //参加表明と参加辞退を切り替える
-        joinData ? await joinUseCase.exit(req, res, userId, eventId) : await joinUseCase.entry(req, res, userId, eventId)
+        joiningData ? await joinUseCase.exit(req, res, userId, eventId) : await joinUseCase.entry(req, res, userId, eventId)
 
         res.redirect('/events/show/'+ eventId);
     },
@@ -288,19 +288,19 @@ module.exports = {
         req.session.updateEventId = null;
         res.redirect('/events');
     },
-    joinPayment: async(req, res, next) => {
+    participationPayment: async(req, res, next) => {
         const EventId = req.params.id;
         const oneEvent = await eventUseCase.findOneEvent(EventId);
-        let isJoin = false;
+        let isJoining = false;
         let isFavorite = false;
-        const joinUser = oneEvent.User;
+        const joiningUser = oneEvent.User;
         const favoriteUser = oneEvent.UserFavorite;
         req.session.eventId = EventId
 
         //あなたはそのイベントに参加予定か？
-        joinUser.forEach(element => {
+        joiningUser.forEach(element => {
             if (element.id == req.session.user.id) {
-                isJoin = true;
+                isJoining = true;
             }
         });
         //あなたはそのイベントをお気に入り登録しているか
@@ -319,7 +319,7 @@ module.exports = {
             title: 'events/show',
             login: req.session.user,
             event: oneEvent,
-            isJoin: isJoin,
+            isJoin: isJoining,
             isFavorite: isFavorite,
             writter: writter,
             err: null,

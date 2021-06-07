@@ -33,7 +33,6 @@ module.exports = {
         return oneUser
     },
     findForPayload: async function (res, params) {
-        console.log("params", params)
         const oneUser = await db.User.findOne({
             where: {
                 email: params.email,
@@ -86,75 +85,11 @@ module.exports = {
         });
         return updatedUser;
     },
-    fileUpload: async function (req, res, next) {
-        try {
-    
-            if (!req.files || Object.keys(req.files).length === 0) {
-                return res.status(400).send('No files were uploaded');
-            }
-        
-            let uploadFile = req.files.uploadFile;
-        
-            // アップロードファイルは20MB以内
-            if (uploadFile.size > 20*1024*1024) {
-              return res.status(400).send('File size is too big');
-            }
-        
-            // 対応しているのはpng, jpg, gif, jpegのファイルとする
-            let uploadFileExt = path.extname(uploadFile.name);
-        
-            if(uploadFileExt !== '.png' && uploadFileExt !== '.jpg' && uploadFileExt !== '.gif' && uploadFileExt !== '.jpeg') {
-              return res.status(400).send('Only png, jpg, gif and jpeg are available');
-            }
-        
-            // 保存するファイル名は同じファイル名が生じるケースを考えてDate.now()をつけたす
-            let saveFilename = `${path.basename(uploadFile.name, uploadFileExt)}-${Date.now()}${uploadFileExt}`;
-        
-            // サーバー上の保存位置
-            let uploadPath = path.join(`./public/img/upload_icon/${saveFilename}`);
-        
-            console.log(`ファイル名: ${uploadFile.name}`);
-            console.log(`保存パス: ${uploadPath}`);
-        
-            // メモリ上にあるファイルをサーバーパスへ移動させる
-            uploadFile.mv( uploadPath, async(err) => {
-
-                if (err) {
-                return res.status(500).send(err);
-                }
-                // sharpをt使ってリサイズする時のファイル名
-                const resizeURL = `${path.basename(saveFilename, path.extname(saveFilename))}-resize.jpg`;
-
-                sharp(uploadPath).resize(200, 200, {
-                    fit: 'inside'
-                }).toFile(path.join(`./public/img/upload_icon/${resizeURL}`), (err, info)=>{
-                    if(err){
-                        throw err 
-                    }
-                    console.log(info);
-                });
-
-                await db.User.update({
-                    image: resizeURL,
-                }, {
-                    where: { id: req.session.user.id, }
-                }).catch(err => {
-                    res.render('layout', { layout_name: 'error', title: 'ERROR', msg: err });
-                })
-                res.redirect('/user/' + req.session.user.id)
-                
-            });
-        } catch (err) {
-            console.log(err); next(err);
-        }
-    },
     fileUploadToS3: async function (req, res, next) {
         const s3 = new AWS.S3();
-        console.log("画像アップロードテスト", req.files.uploadFile)
         const fileContent  = Buffer.from(req.files.uploadFile.data, 'binary');
         const fileName = req.session.user.id + req.session.user.name + req.files.uploadFile.name//画像名
     
-        // Setting up S3 upload parameters
         const params = {
             Bucket: 'eventernagamori/users',
             Key: fileName,
@@ -169,7 +104,6 @@ module.exports = {
             res.render('layout', { layout_name: 'error', title: 'ERROR', msg: err });
         })
     
-        // Uploading files to the bucket
         s3.upload(params, function(err, data) {
             if (err) {
                 throw err;
@@ -178,7 +112,7 @@ module.exports = {
         res.redirect('/user/' + req.session.user.id)
 
     },
-    findFollowee: async function (res, oneUser, loginUserId) {
+    discoveredFollowee: async function (res, oneUser, loginUserId) {
         let alwaysFollow = false;
         let followee =  oneUser.followee;
         
@@ -232,76 +166,76 @@ module.exports = {
         });
         return allMessages;
     },
-    isArticleWrittenByFollower: async function (res, articleAllData, user) {
+    isArticleByFollower: async function (res, allArticleData, user) {
         //フォローした人の記事かどうか
         let articleList = [];
 
-        for (let m = 0 ; m < articleAllData.length ; m++) {
+        for (let m = 0 ; m < allArticleData.length ; m++) {
             //フォローしてる人が書いた場合
             for (let i = 0 ; i < user.follower.length ; i++) {
                 //フォローした人のidと投稿した人のidが一致すれば
-                if (user.follower[i].id == articleAllData[m].userId) {
-                    articleList.push(articleAllData[m])
+                if (user.follower[i].id == allArticleData[m].userId) {
+                    articleList.push(allArticleData[m])
                 }
             }
             //ログインユーザーが書いたつぶやきも対象
-            if (user.id == articleAllData[m].userId) {
-                articleList.push(articleAllData[m])
+            if (user.id == allArticleData[m].userId) {
+                articleList.push(allArticleData[m])
             }
         }
         return articleList;
     },
-    isLikedToArticle: async function (req, articleList) {
-        let isLike = [];
+    isYourLikeToArticle: async function (req, articleList) {
+        let yourLikeFlg = [];
         //投稿１つあたり
         for (let n = 0 ; n < articleList.length ; n++) {
-            let likeUsers = articleList[n].LikedUser
-            isLike[n] = 'yetLike'
+            let usersLikeList = articleList[n].LikedUser
+            yourLikeFlg[n] = 'yetLike'
             //いいねしたユーザー1人ごとにあたり
-            for (let i = 0 ; i < likeUsers.length ; i++) {
+            for (let i = 0 ; i < usersLikeList.length ; i++) {
                 //ログインしているユーザーがいいねしているかどうかを判定する。
-                if (likeUsers[i].id == req.session.user.id) {
-                    isLike[n] = 'doLike'
+                if (usersLikeList[i].id == req.session.user.id) {
+                    yourLikeFlg[n] = 'doLike'
                     break
                 }
             }
         }
-        return isLike
+        return yourLikeFlg
     },
     getOthersUsers: async function (req, users) {
-        let friends = []
+        let othersUsers = []
         for (let i = 0 ; i < users.length ; i++) {
             //ログインユーザー以外の全ての友達
             if (users[i].id != req.session.user.id) {
-                friends.push(users[i])
+                othersUsers.push(users[i])
             }
         }
-        return friends
+        return othersUsers
     },
-    isFollow: async function (req, friends) {
-        let isFollow = []
+    isYourFollow: async function (req, otherUsers) {
+        let isYourFollow = []
         //その友達ひとりずつに対して
-        for (let n = 0 ; n < friends.length ; n++) {
+        for (let n = 0 ; n < otherUsers.length ; n++) {
             //フォロワーが一人もいない場合
-            if (friends[n].followee.length == 0) {
-                isFollow[n] = false
+            if (otherUsers[n].followee.length == 0) {
+                isYourFollow[n] = false
             }
             
-            let followee = friends[n].followee;
+            let followee = otherUsers[n].followee;
             //フォロワーをひとりずつ確認して
             for (let m = 0 ; m < followee.length ; m++) {
                 //ログインユーザーがフォロワーの中にいれば
                 if (followee[m].id == req.session.user.id) {
-                    isFollow[n] = true
+                    isYourFollow[n] = true
                 } else {
-                    isFollow[n] = false
+                    isYourFollow[n] = false
                 }
             }
         }
-        return isFollow
+        return isYourFollow
     },
     searchUserByName: async function (req, res) {
-        let findUsers = await db.User.findAll({
+        let discoveredUsers = await db.User.findAll({
             include: ['Event', 'FavoriteEvent', 'follower', 'followee'],
             where: {
                 name: {
@@ -314,7 +248,7 @@ module.exports = {
         }).catch(err => {
             res.render('layout', { layout_name: 'error', title: 'ERROR', msg: err });
         });
-        return findUsers;
+        return discoveredUsers;
     }
 
 

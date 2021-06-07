@@ -16,6 +16,6 @@ router.get('/search/:TagName', usersController.verifyJWT, eventsController.searc
 router.get('/history', usersController.verifyJWT, eventsController.history);
 router.post('/Favorite', usersController.verifyJWT, eventsController.favorite);
 router.get('/FavoriteList', usersController.verifyJWT, eventsController.FavoriteList);
-router.get('/joinPayment/:id', usersController.verifyJWT, eventsController.joinPayment);
+router.get('/participationPayment/:id', usersController.verifyJWT, eventsController.participationPayment);
 
 module.exports = router;
