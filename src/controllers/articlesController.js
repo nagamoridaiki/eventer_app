@@ -24,13 +24,13 @@ const Message = require("../models/message")
 module.exports = {
     index: async(req, res, next) => {
         //全イベント情報取得
-        const articleAllData = await articlesUseCase.articleGetAll()
+        const allArticleData = await articlesUseCase.articleGetAll()
         //ログインしてるユーザー
         let user = await userUseCase.findOneUser(res, req.session.user.id);
         //フォローした人の記事かどうか
-        let articleList = await userUseCase.isArticleWrittenByFollower(res, articleAllData, user)
+        let articleList = await userUseCase.isArticleByFollower(res, allArticleData, user)
         //フォローした人の記事にいいねしているか
-        let isLike = await userUseCase.isLikedToArticle(req, articleList)
+        let isLike = await userUseCase.isYourLikeToArticle(req, articleList)
 
         let articleUpdatedDate = [];
         let commentList = []

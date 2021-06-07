@@ -27,26 +27,26 @@
                 </tr>
             </thead>
             <tbody>
-                <% for(let i in data.users.friends) { %>
+                <% for(let i in data.users.otherUsers) { %>
                     <tr>
                         <td>
-                            <%if (data.users.friends[i].image != null) {%>
-                                <img src="https://eventernagamori.s3-ap-northeast-1.amazonaws.com/users/<%= data.users.friends[i].image %>" width="25px" height="25px" class="flex-row-reverse rounded-circle"/>
+                            <%if (data.users.otherUsers[i].image != null) {%>
+                                <img src="https://eventernagamori.s3-ap-northeast-1.amazonaws.com/users/<%= data.users.otherUsers[i].image %>" width="25px" height="25px" class="flex-row-reverse rounded-circle"/>
                             <% } else { %>
                                 <img src="https://eventernagamori.s3-ap-northeast-1.amazonaws.com/fixedImage/noperson.jpg" width="25px" height="25px" class="flex-row-reverse rounded-circle"/>
                             <% } %>                
-                            <a href="user/<%= data.users.friends[i].id %>">
-                                <%= data.users.friends[i].name %>
+                            <a href="user/<%= data.users.otherUsers[i].id %>">
+                                <%= data.users.otherUsers[i].name %>
                             </a>
                         </td>
                         <td>
-                            <%= data.users.friends[i].email %>
+                            <%= data.users.otherUsers[i].email %>
                         </td>
                         <td>
-                            <%if (data.users.isFollow[i] == true) {%>
-                                <a href="/user/<%= data.users.friends[i].id %>/follow" class="btn btn-primary">フォローを外す</a>
+                            <%if (data.users.followUserFlg[i] == true) {%>
+                                <a href="/user/<%= data.users.otherUsers[i].id %>/follow" class="btn btn-primary">フォローを外す</a>
                             <% } else { %>
-                                <a href="/user/<%= data.users.friends[i].id %>/follow" class="btn btn-primary">フォロー</a>
+                                <a href="/user/<%= data.users.otherUsers[i].id %>/follow" class="btn btn-primary">フォロー</a>
                             <% } %>
                         </td>
                     </tr>
