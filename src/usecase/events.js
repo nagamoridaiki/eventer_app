@@ -106,7 +106,6 @@ module.exports = {
             let favoriteLength = oneEventData.UserFavorite.length
             favoriteLengthList[oneEventData.id] = favoriteLength//イベントのid : お気に入りの数
         });
-        console.log(favoriteLengthList)
         let allEventId = Object.keys(favoriteLengthList);
 
         let favoriteEventList = []
@@ -127,68 +126,6 @@ module.exports = {
         favoriteEventList.push(secondFavoritedEventId)
 
         return favoriteEventList
-    },
-    fileUpload: async function (req, res, next, newEventId) {
-        try {
-    
-            if (!req.files || Object.keys(req.files).length === 0) {
-                return res.status(400).send('No files were uploaded');
-            }
-        
-            let uploadFile = req.files.uploadFile;
-        
-            // アップロードファイルは20MB以内
-            if (uploadFile.size > 20*1024*1024) {
-              return res.status(400).send('File size is too big');
-            }
-        
-            // 対応しているのはpng, jpg, gif, jpegのファイルとする
-            let uploadFileExt = path.extname(uploadFile.name);
-        
-            if(uploadFileExt !== '.png' && uploadFileExt !== '.jpg' && uploadFileExt !== '.gif' && uploadFileExt !== '.jpeg') {
-              return res.status(400).send('Only png, jpg, gif and jpeg are available');
-            }
-        
-            // 保存するファイル名は同じファイル名が生じるケースを考えてDate.now()をつけたす
-            let saveFilename = `${path.basename(uploadFile.name, uploadFileExt)}-${Date.now()}${uploadFileExt}`;
-        
-            // サーバー上の保存位置
-            let uploadPath = path.join(`./public/img/upload_events/${saveFilename}`);
-        
-            console.log(`ファイル名: ${uploadFile.name}`);
-            console.log(`保存パス: ${uploadPath}`);
-        
-            // メモリ上にあるファイルをサーバーパスへ移動させる
-            uploadFile.mv( uploadPath, async(err) => {
-
-                if (err) {
-                return res.status(500).send(err);
-                }
-                // sharpをt使ってリサイズする時のファイル名
-                const resizeURL = `${path.basename(saveFilename, path.extname(saveFilename))}-resize.jpg`;
-
-                sharp(uploadPath).resize(400, 400, {
-                    fit: 'inside'
-                }).toFile(path.join(`./public/img/upload_events/${resizeURL}`), (err, info)=>{
-                    if(err){
-                        throw err 
-                    }
-                    console.log(info);
-                });
-
-                await db.Event.update({
-                    image: resizeURL,
-                }, {
-                    where: { id: newEventId }
-                }).catch(err => {
-                    res.render('layout', { layout_name: 'error', title: 'ERROR', msg: err });
-                })
-
-                res.redirect('/events/')
-            });
-        } catch (err) {
-            console.log(err); next(err);
-        }
     },
     fileCreateToS3: async function (req, res, next, newEventId) {
     
@@ -228,7 +165,6 @@ module.exports = {
             res.redirect('/events/')
         }
         const s3 = new AWS.S3();
-        console.log("画像アップロードテスト", req.files.file)
         const fileContent  = Buffer.from(req.files.file.data, 'binary');
         const fileName = req.session.newEvent + req.files.file.name//画像名
         // Setting up S3 upload parameters
@@ -266,7 +202,6 @@ module.exports = {
                 datetime : holdDate[m]
             }
         }
-
         //開催日時ごとにイベントをまとめる
         let filterHoldDate = holdDate.filter((element, index, self) =>
             self.findIndex(e => 
@@ -275,7 +210,6 @@ module.exports = {
                 e.Date === element.Date
             ) === index
         );
-
         /*配列し直す
         dateTimeList = [2021-XX-XX、2021-YY-YY、2021-ZZ-ZZ]
         displayEventData = [
@@ -338,14 +272,13 @@ module.exports = {
             
           return response;
       
-        } catch (e) {
-          const response = generateErrorResponse(e.message);
+        } catch (err) {
+          const response = generateErrorResponse(err.message);
       
           res.status(500);
           res.send(response);
         }
     }
-
 }
 
 function favariteLengthCount (res, allEventId, favoriteLengthList) {
