@@ -85,7 +85,7 @@
                             <div id="commentFormDisplayFlg" data-toggle="modal" onclick="document.getElementById('commentPost_<%= data.content.article[i].id %>').style.display = 'block';"><i class="far fa-comment" style="color:mediumturquoise;"></i><span> <%= data.content.article[i].Comment.length %>件</span></div>
                             <!-- コメントを書く -->
                             <div id="commentPost_<%= data.content.article[i].id %>"  style="display: none;">
-                                <form method="post" action="/articles/commentAdd">
+                                <form method="post" action="/articles/addComment">
                                     <input type="hidden" name="articleId" value="<%= data.content.article[i].id %>">
                                     <textarea type="text" name="body" class="form-control" rows="1" required></textarea>
                                     <button class="btn btn-primary" type="submit"><i class="fas fa-location-arrow"></i></button>

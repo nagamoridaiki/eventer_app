@@ -32,22 +32,22 @@ module.exports = {
         //フォローした人の記事にいいねしているか
         let isLike = await userUseCase.isYourLikeToArticle(req, articleList)
 
-        let articleUpdatedDate = [];
+        let updatedArticleDate = [];
         let commentList = []
         let commentUpdatedAt = []
         for (let i = 0 ; i < articleList.length ; i++) {
             //記事更新日時表示
-            articleUpdatedDate.push(articlesUseCase.getApdatedAt(articleList[i]));
+            updatedArticleDate.push(articlesUseCase.getApdatedAt(articleList[i]));
             //各つぶやきに対するコメント
             let comments = await articlesUseCase.getCommentsById(articleList[i].id)
-            let commentUpdatedDate = [];
+            let updatedCommentDate = [];
 
             for (let n = 0 ; n < comments.length ; n++) {
                 //コメント更新日時表示
-                commentUpdatedDate.push(articlesUseCase.getApdatedAt(comments[n]));
+                updatedCommentDate.push(articlesUseCase.getApdatedAt(comments[n]));
             }
             commentList[i] = comments
-            commentUpdatedAt[i] = commentUpdatedDate
+            commentUpdatedAt[i] = updatedCommentDate
         }
 
         const data = {
@@ -55,12 +55,11 @@ module.exports = {
             login: req.session.user,
             content: {
                 article: articleList,
-                updatedDate: articleUpdatedDate,
+                updatedDate: updatedArticleDate,
                 comment: commentList,
                 commentUpdated: commentUpdatedAt,
                 isLike: isLike,
             },
-            
         }
         res.render('layout', { layout_name: 'articles/articleList', data });
     },
@@ -76,25 +75,23 @@ module.exports = {
         //投稿作成
         const newArticleData = await articlesUseCase.articleCreate(req.session.user.id, req.body);
         req.session.newArticle = newArticleData.id
-        next()
+        res.redirect('/articles')
     },
     delete: async(req, res, next) => {
         await articlesUseCase.delete(req.params.id);
         res.redirect('/articles');
     },
     like: async(req, res, next) => {
-
         //いいねしているかを判定する。
         const likeData = await likeUseCase.findOne(req.body);
-
         //参加表明と参加辞退を切り替える
         likeData ? await likeUseCase.unlike(res, req.body) : await likeUseCase.like(res, req.body)
 
         res.redirect('/articles');
     },
-    commentAdd: async(req, res, next) => {
+    addComment: async(req, res, next) => {
         //コメント投稿
-        await articlesUseCase.commentAdd(req.session.user.id, req.body);
+        await articlesUseCase.addComment(req.session.user.id, req.body);
         res.redirect('/articles');
     },
     imageUpload: async(req, res, next) => {
@@ -108,8 +105,8 @@ module.exports = {
         req.session.newArticle = null;
         res.redirect('/articles');
     },
-    messageSend: async(req, res, next) => {
-        await articlesUseCase.messageSend(req.body)
+    SendMessage: async(req, res, next) => {
+        await articlesUseCase.SendMessage(req.body)
         res.redirect('/user/'+req.body.receiveUserId);
     },
 
