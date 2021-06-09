@@ -97,7 +97,7 @@
                                     <% for(let n in data.content.comment[i]) { %>
                                         <hr class="mt-0 mb-2">
 
-                                        <%if (data.content.comment[i][n].User.image != null) {%>
+                                        <%if (data.content.comment[i][n].User != null) {%>
                                             <img src="https://eventernagamori.s3-ap-northeast-1.amazonaws.com/users/<%= data.content.comment[i][n].User.image %>" width="5%" height="5%" class="flex-row-reverse rounded-circle"/>
                                         <% } else { %>
                                             <img src="https://eventernagamori.s3-ap-northeast-1.amazonaws.com/fixedImage/noperson.jpg" width="5%" height="5%" class="flex-row-reverse rounded-circle"/>

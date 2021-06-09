@@ -2,130 +2,118 @@
 
 module.exports = {
     up: async(queryInterface, Sequelize) => {
-        return queryInterface.bulkInsert('EventTags', [
+        return queryInterface.bulkInsert('Likes', [
             {
-                eventId: 1,
-                tagId: 1,
+                userId: 1,
+                articleId: 1,
                 createdAt: new Date(),
                 updatedAt: new Date()
             },
             {
-                eventId: 1,
-                tagId: 2,
+                userId: 1,
+                articleId: 2,
                 createdAt: new Date(),
                 updatedAt: new Date()
             },
             {
-                eventId: 2,
-                tagId: 2,
+                userId: 1,
+                articleId: 3,
                 createdAt: new Date(),
                 updatedAt: new Date()
             },
             {
-                eventId: 2,
-                tagId: 3,
+                userId: 1,
+                articleId: 5,
                 createdAt: new Date(),
                 updatedAt: new Date()
             },
             {
-                eventId: 2,
-                tagId: 4,
+                userId: 2,
+                articleId: 1,
                 createdAt: new Date(),
                 updatedAt: new Date()
             },
             {
-                eventId: 8,
-                tagId: 5,
+                userId: 2,
+                articleId: 3,
                 createdAt: new Date(),
                 updatedAt: new Date()
             },
             {
-                eventId: 8,
-                tagId: 6,
+                userId: 2,
+                articleId: 4,
                 createdAt: new Date(),
                 updatedAt: new Date()
             },
             {
-                eventId: 8,
-                tagId: 2,
+                userId: 2,
+                articleId: 5,
                 createdAt: new Date(),
                 updatedAt: new Date()
             },
             {
-                eventId: 6,
-                tagId: 7,
+                userId: 3,
+                articleId: 1,
                 createdAt: new Date(),
                 updatedAt: new Date()
             },
             {
-                eventId: 6,
-                tagId: 8,
+                userId: 3,
+                articleId: 2,
                 createdAt: new Date(),
                 updatedAt: new Date()
             },
             {
-                eventId: 6,
-                tagId: 9,
+                userId: 3,
+                articleId: 3,
                 createdAt: new Date(),
                 updatedAt: new Date()
             },
             {
-                eventId: 6,
-                tagId: 10,
+                userId: 3,
+                articleId: 4,
                 createdAt: new Date(),
                 updatedAt: new Date()
             },
             {
-                eventId: 7,
-                tagId: 11,
+                userId: 4,
+                articleId: 1,
                 createdAt: new Date(),
                 updatedAt: new Date()
             },
             {
-                eventId: 7,
-                tagId: 10,
+                userId: 4,
+                articleId: 4,
                 createdAt: new Date(),
                 updatedAt: new Date()
             },
             {
-                eventId: 7,
-                tagId: 12,
+                userId: 4,
+                articleId: 5,
                 createdAt: new Date(),
                 updatedAt: new Date()
             },
             {
-                eventId: 3,
-                tagId: 2,
+                userId: 5,
+                articleId: 2,
                 createdAt: new Date(),
                 updatedAt: new Date()
             },
             {
-                eventId: 3,
-                tagId: 13,
+                userId: 5,
+                articleId: 5,
                 createdAt: new Date(),
                 updatedAt: new Date()
             },
             {
-                eventId: 5,
-                tagId: 9,
+                userId: 6,
+                articleId: 5,
                 createdAt: new Date(),
                 updatedAt: new Date()
             },
             {
-                eventId: 5,
-                tagId: 14,
-                createdAt: new Date(),
-                updatedAt: new Date()
-            },
-            {
-                eventId: 4,
-                tagId: 14,
-                createdAt: new Date(),
-                updatedAt: new Date()
-            },
-            {
-                eventId: 4,
-                tagId: 15,
+                userId: 6,
+                articleId: 4,
                 createdAt: new Date(),
                 updatedAt: new Date()
             },
@@ -133,6 +121,6 @@ module.exports = {
     },
 
     down: async(queryInterface, Sequelize) => {
-        return queryInterface.bulkDelete('EventTags', null, {});
+        return queryInterface.bulkDelete('Likes', null, {});
     }
 };
