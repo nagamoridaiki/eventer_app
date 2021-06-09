@@ -6,6 +6,7 @@ module.exports = {
                 name: 'Taro',
                 password: 'yamada',
                 email: 'taro@yamada.jp',
+                image: '1Tarojon.jpeg',
                 createdAt: new Date(),
                 updatedAt: new Date()
             },
@@ -13,6 +14,7 @@ module.exports = {
                 name: 'Hanako',
                 password: 'flower',
                 email: 'hanako@flower.com',
+                image: '2Hanakoakiko.jpeg',
                 createdAt: new Date(),
                 updatedAt: new Date()
             },
@@ -20,6 +22,7 @@ module.exports = {
                 name: 'Jiro',
                 password: 'change',
                 email: 'jiro@change.com',
+                image: '3Jiroakio.jpeg',
                 createdAt: new Date(),
                 updatedAt: new Date()
             },
@@ -27,6 +30,7 @@ module.exports = {
                 name: 'Sachiko',
                 password: 'happy',
                 email: 'sachiko@happy.jp',
+                image: '4Sachikoazusa.jpeg',
                 createdAt: new Date(),
                 updatedAt: new Date()
             },
@@ -34,6 +38,7 @@ module.exports = {
                 name: 'Saburo',
                 password: 'Saburo',
                 email: 'Saburo@saburo.jp',
+                image: '5Saburosaburo.jpeg',
                 createdAt: new Date(),
                 updatedAt: new Date()
             },
