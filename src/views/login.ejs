@@ -23,7 +23,13 @@
                 <input type="email" name="email" id="inputEmail" class="form-control" placeholder="Email address" required>
                 <label for="inputPassword">Password</label>
                 <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Password" required>
-                <br /><button class="btn btn-lg btn-primary btn-block" type="submit">Login</button>
+                <br /><button class="btn btn-lg btn-primary btn-block" type="submit">ログイン</button>
+            </form>
+            <br>
+            <form class="form-signin" action="/login" method="POST">
+                <input type="hidden" name="email" id="inputEmail" value="taro@yamada.jp" placeholder="Email address">
+                <input type="hidden" name="password" id="inputPassword" value="yamada" placeholder="Password">
+                <br /><button class="btn btn-outline-info shadow-sm mb-5 rounded btn-lg btn-block" type="submit">テストユーザー(Taro)としてログイン</button>
             </form>
         </div>
     </div>
