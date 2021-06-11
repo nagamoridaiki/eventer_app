@@ -136,7 +136,7 @@ module.exports = {
     update: async(req, res, next) => {
         await userUseCase.userUpdate(res, req.body);
         //取得したuser情報をもとに画面にレンダリング
-        res.redirect('/user/' + req.session.user.id)
+        next();
     },
     imageUpload: async(req, res, next) => {
         await userUseCase.fileUploadToS3(req, res, next);

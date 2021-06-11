@@ -18,7 +18,7 @@ router.get('/', usersController.verifyJWT, usersController.index, usersControlle
 router.get('/logout', usersController.logout)
 router.get('/user/:id', usersController.verifyJWT, usersController.myProf);
 router.get('/user/:id/edit', usersController.verifyJWT, usersController.Edit);
-router.post('/user/:id/update', usersController.verifyJWT, usersController.update);
+router.post('/user/:id/update', usersController.verifyJWT, usersController.update, usersController.imageUpload);
 router.get('/user/:id/follow', usersController.verifyJWT, usersController.follow);
 
 router.post('/upload', usersController.verifyJWT, usersController.imageUpload);
