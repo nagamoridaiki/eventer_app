@@ -85,7 +85,10 @@ module.exports = {
         });
         return updatedUser;
     },
-    fileUploadToS3: async function (req, res, next) {
+    fileUploadToS3: async function (req, res) {
+        if (req.files == null || !req.files.uploadFile) {
+            res.redirect('/user/' + req.session.user.id)
+        }
         const s3 = new AWS.S3();
         const fileContent  = Buffer.from(req.files.uploadFile.data, 'binary');
         const fileName = req.session.user.id + req.session.user.name + req.files.uploadFile.name//画像名

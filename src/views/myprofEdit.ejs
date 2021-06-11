@@ -11,30 +11,48 @@
 </head>
 
 <body class="container">
-    <header>
-        <h1 class="display-4">
-            <%= data.title %>
-        </h1>
-    </header>
-    <div role="main">
-        <div class="data-form">
-            <form class="form-signin" action="/user/<%= data.user.id %>/update" method="POST">
-                <input type="hidden" name="id" value="<%= data.user.id %>">
-                <h2 class="form-signin-heading">Edit a user:</h2>
-                <label for="name">Name</label>
-                <input type="text" name="name" id="name" value="<%= data.user.name %>" class="form-control" placeholder="name" autofocus required>
-                <label for="selfIntroduction">Self Introduction</label>
-                <input type="text" name="selfIntroduction" id="selfIntroduction" value="<%= data.user.selfIntroduction %>" class="form-control" placeholder="selfIntroduction" >
-                <label for="inputEmail">Email address</label>
-                <input type="email" name="email" id="inputEmail" value="<%= data.user.email %>" class="form-control" placeholder="Email address" required>
-                <label for="inputPassword">Password</label>
-                <input type="password" name="password" id="inputPassword"  value="<%= data.user.password %>" class="form-control" placeholder="Password" required>
-                <label for="passwordConfirm">Password Confirm</label>
-                <input type="password" name="passwordConfirm" id="passwordConfirm"   value="<%= data.user.password %>" class="form-control" placeholder="Password" required>
-                <br /><button class="btn btn-lg btn-primary btn-block" type="submit">edit</button>
-            </form>
-        </div>
+    <div class="container">   
+        <h1 class="mt-4 mb-5">プロフィール編集</h1>
+        <form method="post" action="/user/<%= data.user.id %>/update" enctype="multipart/form-data">
+            <input type="hidden" name="id" value="<%= data.user.id %>">
+            <div class="form-group mb-4">
+            <label for="B_Name">ユーザー画像</label>
+            <br>
+            <input type="file" name="uploadFile">
+            </div>
+
+            <div class="form-group mb-4">
+            <label for="B_Name">ユーザー名</label>
+            <input type="text" name="name" class="form-control" value="<%= data.user.name %>" required>
+            </div>
+        
+            <div class="form-group mb-4">
+            <label for="B_address">自己紹介</label>
+            <input type="text" name="selfIntroduction" class="form-control" value="<%= data.user.selfIntroduction %>">
+            </div>
+
+            <div class="form-group mb-4">
+            <label for="B_address">メールアドレス</label>
+            <input type="email" name="email" class="form-control" value="<%= data.user.email %>" placeholder="Email address" required>
+
+
+            <div class="form-group mb-4">
+            <label for="B_address">パスワード</label>
+            <input type="text" name="password" class="form-control" value="<%= data.user.password %>" required>
+            </div>
+
+            <div class="form-group mb-4">
+            <label for="B_address">パスワード確認</label>
+            <input type="text" name="passwordConfirm" class="form-control" value="<%= data.user.password %>" required>
+            </div>
+    
+            <div>
+                <input type="submit" value="送信" class="btn btn-primary col-2">
+            </div>
+        </form>
+        <a href="/events" class="btn btn-lite">トップへ</a>
     </div>
+
 </body>
 
 </html>
