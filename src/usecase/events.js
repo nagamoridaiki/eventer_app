@@ -23,7 +23,7 @@ const stripe = require("stripe")("sk_test_XXXXXXXXXXX");
 module.exports = {
     eventGetAll: async function () {
         const allEvent = await db.Event.findAll({
-            include: ['User', 'Tag', 'UserFavorite'],
+            include: ['User', 'Tag', 'UserFavorite','EventDate'],
             order: [
                 ['id', 'DESC']
             ],

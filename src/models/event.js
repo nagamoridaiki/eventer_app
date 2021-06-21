@@ -48,7 +48,7 @@ module.exports = (sequelize, DataTypes) => {
                 }
             }
         },
-        holdDate: DataTypes.DATE,
+        EventDateId: DataTypes.INTEGER,
         isPrivate: DataTypes.BOOLEAN,
         capacity: DataTypes.INTEGER,
         address: DataTypes.STRING,
@@ -73,6 +73,7 @@ module.exports = (sequelize, DataTypes) => {
             as: 'UserFavorite',
             foreignKey: 'eventId'
         });
+        Event.belongsTo(models.EventDate, {foreignKey: 'EventDateId'});
     };
     return Event;
 };

@@ -23,18 +23,6 @@ module.exports = {
         //全タグ情報取得
         const tagAllData = await tagUseCase.tagGetAll();
        
-        const sortTarget = 'holdDate';
-        eventAllData.sort((a, b) => a[sortTarget] - b[sortTarget]);
-
-        let holdDate = [];
-        eventAllData.forEach(function(event) {
-            //開催日時情報
-            holdDate.push(eventUseCase.getHoldDate(event));
-        });
-
-        //日付ごとのイベント並び替え
-        let sortedEventByDateTime = eventUseCase.orderByDateTime(req, res, eventAllData, holdDate)
-
         //お気に入りが数多く付けられている順番でイベントのidを取得する。
         let mostFavoriteEventId = await eventUseCase.eachEventFavoriteLength(res, eventAllData)
         
@@ -44,9 +32,9 @@ module.exports = {
         const data = {
             title: 'Event',
             login: req.session.user,
-            holdDate: holdDate,
-            displayEventData: sortedEventByDateTime.EventData,
-            dateTimeList: sortedEventByDateTime.dateTime,
+            
+            displayEventData: eventAllData,
+            
             Tags: tagAllData,
             maxFavoriteEvent: mostFavoriteEvent,
             secondFavoriteEvent: secondlyFavoriteEvent,

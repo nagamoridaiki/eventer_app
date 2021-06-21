@@ -37,64 +37,62 @@
             </div>
             <div class="col-10">
                 <div class="row">
-                    <% for(let i in data.dateTimeList) { %>
-                        <h4><%= data.dateTimeList[i] %></h4>
-                        <% for(let n in data.displayEventData[i]) { %>
-                            <div class="col-6" style="padding-bottom: 2rem;" >
-                                <div class="row">
-                                    <div class="col-6"  style="height:150px;">
-                                        <%if (data.displayEventData[i][n].image != null) {%>
-                                        <img src="https://eventernagamori.s3-ap-northeast-1.amazonaws.com/events/<%= data.displayEventData[i][n].image %>"  width="100%" height="100%" class="flex-row-reverse">
-                                        <% } else {%>
-                                        <img src="https://eventernagamori.s3-ap-northeast-1.amazonaws.com/fixedImage/noimage-1.jpg" width="100%" height="100%" class="flex-row-reverse"/>
-                                        <% } %>
-                                    </div>
-                                    <div class="col-6">
-                                        <!-- edit delete -->
-                                        <%if (data.displayEventData[i][n].userId == data.login.id) {%>
-                                        <div class="ml-auto card-text" style="float: right;">
-                                            <div class="dropdown">
-                                              <a data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                <i class="fas fa-ellipsis-v"></i>
-                                              </a>
-                                              <div class="dropdown-menu dropdown-menu-right">
-                                                <a class="dropdown-item" href="/events/edit/<%= data.displayEventData[i][n].id %>">
-                                                  <i class="fas fa-pen mr-1"></i>記事を更新する
-                                                </a>
-                                                <div class="dropdown-divider"></div>
-                                                <a class="dropdown-item" href="/events/delete/<%= data.displayEventData[i][n].id %>">
-                                                    <i class="fas fa-trash-alt mr-1"></i>記事を削除する
-                                                </a>
-                                              </div>
+                        
+                    <% for(let n in data.displayEventData) { %>
+                        <div class="col-6" style="padding-bottom: 2rem;" >
+                            <div class="row">
+                                <div class="col-6"  style="height:150px;">
+                                    <%if (data.displayEventData[n].image != null) {%>
+                                    <img src="https://eventernagamori.s3-ap-northeast-1.amazonaws.com/events/<%= data.displayEventData[n].image %>"  width="100%" height="100%" class="flex-row-reverse">
+                                    <% } else {%>
+                                    <img src="https://eventernagamori.s3-ap-northeast-1.amazonaws.com/fixedImage/noimage-1.jpg" width="100%" height="100%" class="flex-row-reverse"/>
+                                    <% } %>
+                                </div>
+                                <div class="col-6">
+                                    <!-- edit delete -->
+                                    <%if (data.displayEventData[n].userId == data.login.id) {%>
+                                    <div class="ml-auto card-text" style="float: right;">
+                                        <div class="dropdown">
+                                            <a data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                            </a>
+                                            <div class="dropdown-menu dropdown-menu-right">
+                                            <a class="dropdown-item" href="/events/edit/<%= data.displayEventData[n].id %>">
+                                                <i class="fas fa-pen mr-1"></i>記事を更新する
+                                            </a>
+                                            <div class="dropdown-divider"></div>
+                                            <a class="dropdown-item" href="/events/delete/<%= data.displayEventData[n].id %>">
+                                                <i class="fas fa-trash-alt mr-1"></i>記事を削除する
+                                            </a>
                                             </div>
                                         </div>
-                                        <% } %>
-                                        <dl>
-                                            <!-- holdDate -->
-                                            <dd><%= data.holdDate[i].Year %>年<%= data.holdDate[i].Month %>月<%= data.holdDate[i].Date %>日 <%= data.holdDate[i].Time  %>〜 </dd>
-                                            <!-- title -->
-                                            <a href="/events/show/<%= data.displayEventData[i][n].id %>">
-                                                <h5><%= data.displayEventData[i][n].title %></h5>
-                                            </a>
-                                            <!-- subTitle -->
-                                            <dd><%= data.displayEventData[i][n].subTitle %></dd>
-                                        </dl>
-                                        <!-- Tag -->
-                                        <ul class="list-inline">
-                                            <% if (data.displayEventData[i][n].Tag!=null) { for (let m in data.displayEventData[i][n].Tag) { %>
-                                                <li class="list-inline-item bg-info text-white p-1" style="border-radius: 0.7em;"><%= data.displayEventData[i][n].Tag[m].name %></li>
-                                            <% }} %>
-                                        </ul>
-                                        <!-- Join -->
-                                        参加状況: <br><%= data.displayEventData[i][n].User.length %> /<%= data.displayEventData[i][n].capacity %>人 (定員)
-                                        <!-- Favorite -->
-                                        <br>
-                                        <br>
-                                        お気に入り登録者: <br><%= data.displayEventData[i][n].UserFavorite.length %>
                                     </div>
+                                    <% } %>
+                                    <dl>
+                                        <!-- EventDate -->
+                                        <dd><%= data.displayEventData[n].EventDate.year %>年<%= data.displayEventData[n].EventDate.month %>月<%= data.displayEventData[n].EventDate.day %>日　<%= data.displayEventData[n].EventDate.hour %>時〜</dd>
+                                        <!-- title -->
+                                        <a href="/events/show/<%= data.displayEventData[n].id %>">
+                                            <h5><%= data.displayEventData[n].title %></h5>
+                                        </a>
+                                        <!-- subTitle -->
+                                        <dd><%= data.displayEventData[n].subTitle %></dd>
+                                    </dl>
+                                    <!-- Tag -->
+                                    <ul class="list-inline">
+                                        <% if (data.displayEventData[n].Tag!=null) { for (let m in data.displayEventData[n].Tag) { %>
+                                            <li class="list-inline-item bg-info text-white p-1" style="border-radius: 0.7em;"><%= data.displayEventData[n].Tag[m].name %></li>
+                                        <% }} %>
+                                    </ul>
+                                    <!-- Join -->
+                                    参加状況: <br><%= data.displayEventData[n].User.length %> /<%= data.displayEventData[n].capacity %>人 (定員)
+                                    <!-- Favorite -->
+                                    <br>
+                                    <br>
+                                    お気に入り登録者: <br><%= data.displayEventData[n].UserFavorite.length %>
                                 </div>
                             </div>
-                        <% } %>
+                        </div>
                     <% } %>
                 </div>
             </div>
