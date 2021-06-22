@@ -50,13 +50,28 @@ module.exports = {
         })
         return oneEvent
     },
-    eventCreate: async function (EventId, params) {
+    eventCreate: async function (res, EventId, params) {
+        let year = moment(params.holdDate).format('Y');
+        let month = moment(params.holdDate).format('M');
+        let day = moment(params.holdDate).format('D');
+        let hour = moment(params.holdDate).format('HH');
+
+        let EventDate = await db.EventDate.findOrCreate({
+            where: {
+                year: year,
+                month: month,
+                day: day,
+            }
+        }).catch((err) => {
+            res.render('layout', { layout_name: 'error', title: 'ERROR', msg: err });
+        })
+
         const newEvent = await db.Event.create({
             userId: EventId,
             title: params.title,
             subTitle: params.subTitle,
             detail: params.detail,
-            holdDate: params.holdDate,
+            EventDateId: EventDate[0].id,
             capacity: params.capacity,
             address: params.address,
             price: params.price,

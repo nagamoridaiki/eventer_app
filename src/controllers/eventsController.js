@@ -135,7 +135,7 @@ module.exports = {
     },
     create: async(req, res, next) => {
         //イベント作成
-        const newEventData = await eventUseCase.eventCreate(req.session.user.id, req.body);
+        const newEventData = await eventUseCase.eventCreate(res, req.session.user.id, req.body);
         req.session.newEvent = newEventData.id
         //タグ作成およびイベントとの紐付け
         if (req.body.tags == "") {
