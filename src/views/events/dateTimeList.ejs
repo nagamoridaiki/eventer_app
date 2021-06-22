@@ -38,7 +38,9 @@
             <div class="col-10">
                 <div class="row">
                     <% for(let i in data.contents.eventDate) { %>
-                        <h5><%= data.contents.eventDate[i].year %>年<%= data.contents.eventDate[i].month %>月<%= data.contents.eventDate[i].day %>日</h5>
+                            <% if (data.contents.eventDate[i].Event.length > 0) { %>
+                                <h5><%= data.contents.eventDate[i].year %>年<%= data.contents.eventDate[i].month %>月<%= data.contents.eventDate[i].day %>日</h5>
+                            <% } %>
                         <% for(let e in data.contents.event[i]) { %>
                             <div class="col-6" style="padding-bottom: 2rem;" >
                                 <div class="row">
@@ -71,7 +73,7 @@
                                         <% } %>
                                         <dl>
                                             <!-- EventDate -->
-                                            <dd><%= data.contents.eventDate[i].year %>年<%= data.contents.eventDate[i].month %>月<%= data.contents.eventDate[i].day %>日　<%= data.contents.eventDate[i].hour %>時〜</dd>
+                                            <dd><%= data.contents.eventDate[i].year %>年<%= data.contents.eventDate[i].month %>月<%= data.contents.eventDate[i].day %>日　<%= data.contents.event[i][e].EventTime.start %>時〜</dd>
                                             <!-- title -->
                                             <a href="/events/show/<%= data.contents.event[i][e].id %>">
                                                 <h5><%= data.contents.event[i][e].title %></h5>

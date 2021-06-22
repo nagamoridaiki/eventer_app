@@ -26,6 +26,9 @@ module.exports = {
       EventDateId: {
         type: Sequelize.INTEGER
       },
+      EventTimeId: {
+        type: Sequelize.INTEGER
+      },
       isPrivate: {
         type: Sequelize.BOOLEAN
       },

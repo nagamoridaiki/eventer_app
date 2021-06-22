@@ -49,6 +49,7 @@ module.exports = (sequelize, DataTypes) => {
             }
         },
         EventDateId: DataTypes.INTEGER,
+        EventTimeId: DataTypes.INTEGER,
         isPrivate: DataTypes.BOOLEAN,
         capacity: DataTypes.INTEGER,
         address: DataTypes.STRING,
@@ -74,6 +75,7 @@ module.exports = (sequelize, DataTypes) => {
             foreignKey: 'eventId'
         });
         Event.belongsTo(models.EventDate, {foreignKey: 'EventDateId'});
+        Event.belongsTo(models.EventTime, {foreignKey: 'EventTimeId'});
     };
     return Event;
 };

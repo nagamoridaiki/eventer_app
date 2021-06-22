@@ -6,6 +6,7 @@ const Join = require("../models/join")
 const Tag = require("../models/tag")
 const EventTag = require("../models/eventtag")
 const EventDate = require("../models/eventDate")
+const eventTime = require("../models/eventTime")
 const jsonWebToken = require('jsonwebtoken')
 const db = require('../models/index')
 const httpStatus = require('http-status');
@@ -21,23 +22,7 @@ module.exports = {
     index: async(req, res, next) => {
         //イベント開催日とイベント情報取得
         const allEventDate = await eventUseCase.getEventDateAll();
-        let eventDate = []
-        let event = []
-
-        for (let i = 0 ; i < allEventDate.length ; i++) {
-            eventDate[i] = allEventDate[i]
-            
-            let eventData = []
-            for (let e = 0 ; e < allEventDate[i].Event.length ; e++) {
-                eventData[e] = await db.Event.findOne({
-                    where: {
-                        id: allEventDate[i].Event[e].id,
-                    },
-                    include: ['User', 'Tag', 'UserFavorite'],
-                })
-            }
-            event[i] = eventData
-        }
+        const allEventInfo = await eventUseCase.getEventDataOrderByHoldTime(res, allEventDate);
         
         //全イベント情報取得
         const eventAllData = await eventUseCase.eventGetAll();
@@ -53,12 +38,8 @@ module.exports = {
         const data = {
             title: 'Event',
             login: req.session.user,
-            contents: {
-                eventDate: eventDate,
-                event: event,
-            },
-            eventDate: eventDate,
-            displayEventData: eventAllData,
+            contents: allEventInfo,
+            eventDate: allEventInfo.eventDate,
             Tags: tagAllData,
             maxFavoriteEvent: mostFavoriteEvent,
             secondFavoriteEvent: secondlyFavoriteEvent,
@@ -73,13 +54,13 @@ module.exports = {
         let holdDate = [];
         //各イベントそれぞれの
         eventAllData.forEach((event) => {
-            //開催日取得
-            holdDate.push(eventUseCase.getHoldDate(event));
             //各タグのそれぞれが
             event.Tag.forEach((eventtags) => {
                 //各イベントについているタグのいずれかが、探したいタグと一致していれば
                 if (eventtags.name == TagName) {
                     searchEventResult.push(event)
+                    //開催日取得
+                    holdDate.push(event.EventDate);
                 }
             })
         });
@@ -107,10 +88,10 @@ module.exports = {
         let history = oneUser.Event;
 
         for (let i = 0 ; i < history.length ; i++) {
+            const oneEvent = await eventUseCase.findOneEvent(history[i].id)
             //開催日時情報
-            holdDate.push(eventUseCase.getHoldDate(history[i])); 
-            let event = await eventUseCase.findOneEvent(history[i].id)
-            eventHistoryList[i] = event
+            holdDate.push(oneEvent.EventDate); 
+            eventHistoryList[i] = oneEvent
         }
 
         const data = {
@@ -154,7 +135,7 @@ module.exports = {
     edit: async(req, res, next) => {
         const EventId = req.params.id;
         const oneEvent = await eventUseCase.findOneEvent(EventId);
-        const holdDate = await eventUseCase.getHoldDate(oneEvent);
+        const holdDate = await eventUseCase.getFomatedDate(res, oneEvent.EventDate, oneEvent.EventTime);
 
         const data = {
             title: 'Event/Edit',
@@ -267,14 +248,14 @@ module.exports = {
         let FavoritedEventList = [];
         let holdDate = [];
         let FavoriteList = oneUser.FavoriteEvent;
-
+        
         for (let i = 0 ; i < FavoriteList.length ; i++) {
-            //開催日時情報
-            holdDate.push(eventUseCase.getHoldDate(FavoriteList[i])); 
             let event = await eventUseCase.findOneEvent(FavoriteList[i].id)
             FavoritedEventList[i] = event
+            //開催日時情報
+            holdDate.push(event.EventDate); 
         }
-
+        
         const data = {
             title: 'Favorite',
             login: req.session.user,

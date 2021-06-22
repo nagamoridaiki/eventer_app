@@ -6,6 +6,7 @@ const Join = require("../models/join")
 const Tag = require("../models/tag")
 const EventTag = require("../models/eventtag")
 const EventDate = require("../models/eventDate")
+const eventTime = require("../models/eventTime")
 const jsonWebToken = require('jsonwebtoken')
 const db = require('../models/index')
 const httpStatus = require('http-status');
@@ -24,7 +25,7 @@ const stripe = require("stripe")("sk_test_XXXXXXXXXXX");
 module.exports = {
     eventGetAll: async function () {
         const allEvent = await db.Event.findAll({
-            include: ['User', 'Tag', 'UserFavorite','EventDate'],
+            include: ['User', 'Tag', 'UserFavorite','EventDate', 'EventTime'],
             order: [
                 ['id', 'DESC']
             ],
@@ -39,14 +40,35 @@ module.exports = {
             ],
         })
         return allEventDate;
-
+    },
+    getEventDataOrderByHoldTime: async function (res, allEventDate) {
+        let eventDate = []
+        let event = []
+        for (let i = 0 ; i < allEventDate.length ; i++) {
+            eventDate[i] = allEventDate[i]
+            let eventData = []
+            for (let e = 0 ; e < allEventDate[i].Event.length ; e++) {
+                eventData[e] = await db.Event.findOne({
+                    where: {
+                        id: allEventDate[i].Event[e].id,
+                    },
+                    include: ['User', 'Tag', 'UserFavorite', 'EventDate', 'EventTime'],
+                })
+            }
+            event[i] = eventData
+        }
+        const eventData = {
+            'eventDate': eventDate,
+            'event': event
+        }
+        return eventData
     },
     findOneEvent: async function (EventId) {
         const oneEvent = await db.Event.findOne({
             where: {
                 id: EventId,
             },
-            include: ['User', 'Tag', 'UserFavorite'],
+            include: ['User', 'Tag', 'UserFavorite','EventDate', 'EventTime'],
         })
         return oneEvent
     },
@@ -54,7 +76,7 @@ module.exports = {
         let year = moment(params.holdDate).format('Y');
         let month = moment(params.holdDate).format('M');
         let day = moment(params.holdDate).format('D');
-        let hour = moment(params.holdDate).format('HH');
+        let start = moment(params.holdDate).format('HH');
 
         let EventDate = await db.EventDate.findOrCreate({
             where: {
@@ -62,8 +84,11 @@ module.exports = {
                 month: month,
                 day: day,
             }
-        }).catch((err) => {
-            res.render('layout', { layout_name: 'error', title: 'ERROR', msg: err });
+        })
+        let EventTime = await db.EventTime.findOrCreate({
+            where: {
+                start: start
+            }
         })
 
         const newEvent = await db.Event.create({
@@ -72,6 +97,7 @@ module.exports = {
             subTitle: params.subTitle,
             detail: params.detail,
             EventDateId: EventDate[0].id,
+            EventTimeId: EventTime[0].id,
             capacity: params.capacity,
             address: params.address,
             price: params.price,
@@ -81,11 +107,30 @@ module.exports = {
         return newEvent;
     },
     eventUpdate: async function (res, EventId, params){
+        let year = moment(params.holdDate).format('Y');
+        let month = moment(params.holdDate).format('M');
+        let day = moment(params.holdDate).format('D');
+        let start = moment(params.holdDate).format('HH');
+
+        let EventDate = await db.EventDate.findOrCreate({
+            where: {
+                year: year,
+                month: month,
+                day: day,
+            }
+        })
+        let EventTime = await db.EventTime.findOrCreate({
+            where: {
+                start: start
+            }
+        })
+
         await db.Event.update({
             title: params.title,
             subTitle: params.subTitle,
             detail: params.detail,
-            holdDate: params.holdDate,
+            EventDateId: EventDate[0].id,
+            EventTimeId: EventTime[0].id,
             capacity: params.capacity,
             address: params.address,
             price: params.price,
@@ -114,6 +159,27 @@ module.exports = {
         if (Date.length == 1) {
             Date = "0" + Date
         }
+        const holdDate = {
+            Year: Year,
+            Month: Month,
+            Date: Date,
+            Time: Time
+        };
+        return holdDate;
+    },
+    getFomatedDate: function (res, EventDate, EventTime){
+        let Year = String(EventDate.year);
+        let Month = String(EventDate.month);
+        let Date = String(EventDate.day);
+        let Time = String(EventTime.start);
+
+        if (Month.length == 1) {
+            Month = "0" + Month
+        }
+        if (Date.length == 1) {
+            Date = "0" + Date
+        }
+        Time = Time + ":00"
         const holdDate = {
             Year: Year,
             Month: Month,
