@@ -5,6 +5,7 @@ const Event = require("../models/event")
 const Join = require("../models/join")
 const Tag = require("../models/tag")
 const EventTag = require("../models/eventtag")
+const EventDate = require("../models/eventDate")
 const jsonWebToken = require('jsonwebtoken')
 const db = require('../models/index')
 const httpStatus = require('http-status');
@@ -29,6 +30,16 @@ module.exports = {
             ],
         })
         return allEvent;
+    },
+    getEventDateAll: async function () {
+        const allEventDate = await db.EventDate.findAll({
+            include: ['Event'],
+            order: [
+                ['id', 'DESC']
+            ],
+        })
+        return allEventDate;
+
     },
     findOneEvent: async function (EventId) {
         const oneEvent = await db.Event.findOne({

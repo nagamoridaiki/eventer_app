@@ -5,6 +5,7 @@ const Event = require("../models/event")
 const Join = require("../models/join")
 const Tag = require("../models/tag")
 const EventTag = require("../models/eventtag")
+const EventDate = require("../models/eventDate")
 const jsonWebToken = require('jsonwebtoken')
 const db = require('../models/index')
 const httpStatus = require('http-status');
@@ -18,6 +19,26 @@ const favoriteUseCase = require('../usecase/favorite')
 
 module.exports = {
     index: async(req, res, next) => {
+        //イベント開催日とイベント情報取得
+        const allEventDate = await eventUseCase.getEventDateAll();
+        let eventDate = []
+        let event = []
+
+        for (let i = 0 ; i < allEventDate.length ; i++) {
+            eventDate[i] = allEventDate[i]
+            
+            let eventData = []
+            for (let e = 0 ; e < allEventDate[i].Event.length ; e++) {
+                eventData[e] = await db.Event.findOne({
+                    where: {
+                        id: allEventDate[i].Event[e].id,
+                    },
+                    include: ['User', 'Tag', 'UserFavorite'],
+                })
+            }
+            event[i] = eventData
+        }
+        
         //全イベント情報取得
         const eventAllData = await eventUseCase.eventGetAll();
         //全タグ情報取得
@@ -32,9 +53,12 @@ module.exports = {
         const data = {
             title: 'Event',
             login: req.session.user,
-            
+            contents: {
+                eventDate: eventDate,
+                event: event,
+            },
+            eventDate: eventDate,
             displayEventData: eventAllData,
-            
             Tags: tagAllData,
             maxFavoriteEvent: mostFavoriteEvent,
             secondFavoriteEvent: secondlyFavoriteEvent,
