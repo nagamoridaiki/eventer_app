@@ -50,28 +50,13 @@ module.exports = {
     search: async(req, res, next) => {
         const TagName = req.params.TagName;
         const eventAllData = await eventUseCase.eventGetAll();
-        let searchEventResult = [];
-        let holdDate = [];
-        //各イベントそれぞれの
-        eventAllData.forEach((event) => {
-            //各タグのそれぞれが
-            event.Tag.forEach((eventtags) => {
-                //各イベントについているタグのいずれかが、探したいタグと一致していれば
-                if (eventtags.name == TagName) {
-                    searchEventResult.push(event)
-                    //開催日取得
-                    holdDate.push(event.EventDate);
-                }
-            })
-        });
+        const eventSearchResult = eventUseCase.searchByTag(res, eventAllData, TagName)
+
         const tagAllData = await tagUseCase.tagGetAll();
         const data = {
             title: TagName,
             login: req.session.user,
-            content: {
-                event: searchEventResult,
-                holdDate: holdDate,
-            },
+            content: eventSearchResult,
             Tags: tagAllData,
         }
         res.render('layout', { layout_name: 'events/search', data });             
@@ -197,8 +182,6 @@ module.exports = {
 
         //イベントの投稿者
         const writter = await userUseCase.findOneUser(res, oneEvent.userId);
-        //開催日時情報
-        const holdDate = await eventUseCase.getHoldDate(oneEvent);
 
         const data = {
             title: 'events/show',
@@ -208,7 +191,6 @@ module.exports = {
             isFavorite: isFavorite,
             writter: writter,
             err: null,
-            holdDate: holdDate,
         }
         res.render('layout', { layout_name: 'events/show', data });
     },
@@ -305,8 +287,6 @@ module.exports = {
 
         //イベントの投稿者
         const writter = await userUseCase.findOneUser(res, oneEvent.userId);
-        //開催日時情報
-        const holdDate = await eventUseCase.getHoldDate(oneEvent);
 
         const data = {
             title: 'events/show',
@@ -316,7 +296,6 @@ module.exports = {
             isFavorite: isFavorite,
             writter: writter,
             err: null,
-            holdDate: holdDate,
         }
         res.render('layout', { layout_name: 'events/payment', data });
     },

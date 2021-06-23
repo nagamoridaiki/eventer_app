@@ -72,6 +72,27 @@ module.exports = {
         })
         return oneEvent
     },
+    searchByTag: function (res, eventAllData, TagName) {
+        let searchEventResult = [];
+        let holdDate = [];
+        //各イベントそれぞれの
+        eventAllData.forEach((event) => {
+            //各タグのそれぞれが
+            event.Tag.forEach((eventtags) => {
+                //各イベントについているタグのいずれかが、探したいタグと一致していれば
+                if (eventtags.name == TagName) {
+                    searchEventResult.push(event)
+                    //開催日取得
+                    holdDate.push(event.EventDate);
+                }
+            })
+        });
+        const eventSearchResult = {
+            'event': searchEventResult,
+            'holdDate': holdDate
+        }
+        return eventSearchResult
+    },
     eventCreate: async function (res, EventId, params) {
         let year = moment(params.holdDate).format('Y');
         let month = moment(params.holdDate).format('M');
@@ -146,26 +167,6 @@ module.exports = {
             where: { id: EventId }
         })
         return EventId;
-    },
-    //開催日時情報の取得
-    getHoldDate: function (oneEvent){
-        let Year = moment(oneEvent.holdDate).format('Y');
-        let Month = moment(oneEvent.holdDate).format('M');
-        let Date = moment(oneEvent.holdDate).format('D');
-        let Time = moment(oneEvent.holdDate).format('HH:mm');
-        if (Month.length == 1) {
-            Month = "0" + Month
-        }
-        if (Date.length == 1) {
-            Date = "0" + Date
-        }
-        const holdDate = {
-            Year: Year,
-            Month: Month,
-            Date: Date,
-            Time: Time
-        };
-        return holdDate;
     },
     getFomatedDate: function (res, EventDate, EventTime){
         let Year = String(EventDate.year);
@@ -280,66 +281,8 @@ module.exports = {
         });
         
     },
-    orderByDateTime: function (req, res, eventAllData, holdDate) {
-        let eventInfo = []
-        /*イベントの数だけ日付とイベント情報をセットで配列に格納
-        eventInfo = {
-                        event : イベント情報,
-                        datetime : 開催日時
-                    }
-        */
-        for (let m = 0 ; m < eventAllData.length ; m++) {
-            eventInfo[m] = {
-                event : eventAllData[m],
-                datetime : holdDate[m]
-            }
-        }
-        //開催日時ごとにイベントをまとめる
-        let filterHoldDate = holdDate.filter((element, index, self) =>
-            self.findIndex(e => 
-                e.Year === element.Year &&
-                e.Month === element.Month &&
-                e.Date === element.Date
-            ) === index
-        );
-        /*配列し直す
-        dateTimeList = [2021-XX-XX、2021-YY-YY、2021-ZZ-ZZ]
-        displayEventData = [
-            [ //日毎のまとまりでイベントをまとめる
-                {イベントA},
-                {イベントB}
-            ],[
-                {イベントC},
-                {イベントD}
-            ]
-        ]
-         */
-        let dateTimeList = []
-        let displayEventData = []
-        for (let i = 0 ; i < filterHoldDate.length ; i++) {
-            let oneHoldDate = []
-            let oneDay = ""
-            for (let n = 0 ; n < eventInfo.length ; n++) {
-                if (filterHoldDate[i].Month == eventInfo[n].datetime.Month &&
-                    filterHoldDate[i].Date == eventInfo[n].datetime.Date) {
-                        oneHoldDate.push(eventInfo[n].event)
-                }
-            }
-            oneDay = String(filterHoldDate[i].Year)+"-"+String(filterHoldDate[i].Month)+"-"+String(filterHoldDate[i].Date)
-            
-            displayEventData[i] = oneHoldDate
-            dateTimeList[i] = oneDay
-        }
-        //日毎のまとまりでイベント情報を返す。
-        let sortedEventByDateTime = {
-            "EventData" : displayEventData,
-            "dateTime" : dateTimeList
-        }
-        return sortedEventByDateTime
-    },
     payEventPrice: async function (req, res) {
         const { paymentMethodId, paymentIntentId, items, currency, useStripeSdk } = req.body;
-      
         const total = calculateAmount(req.body.items);
       
         try {
