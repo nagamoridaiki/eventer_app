@@ -12,6 +12,8 @@
 
 ![](https://eventernagamori.s3.ap-northeast-1.amazonaws.com/fixedImage/googlemapapi.png)
 
+![](https://eventernagamori.s3.ap-northeast-1.amazonaws.com/fixedImage/payment.png)
+
 ![](https://eventernagamori.s3.ap-northeast-1.amazonaws.com/fixedImage/tweet_comment.png)
 
 
