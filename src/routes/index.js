@@ -14,7 +14,7 @@ router.post('/login', usersController.apiAuthenticate, eventsController.index);
 router.post('/delete/', usersController.verifyJWT, usersController.delete, usersController.indexView);
 
 
-router.get('/', usersController.verifyJWT, usersController.index, usersController.indexView);
+router.get('/', usersController.verifyJWT, eventsController.index);
 router.get('/logout', usersController.logout)
 router.get('/user/:id', usersController.verifyJWT, usersController.myProf);
 router.get('/user/:id/edit', usersController.verifyJWT, usersController.Edit);

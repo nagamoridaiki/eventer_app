@@ -51,6 +51,7 @@ module.exports = {
         }
         const token = jsonWebToken.sign(payload, 'secret');
         req.session.token = token;
+        req.session.user = newUser;
         res.redirect('/')
     },
     delete: async(req, res, next) => {
