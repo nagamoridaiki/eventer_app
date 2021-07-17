@@ -34,7 +34,7 @@
 
 
 # インフラ構成図
-![](https://eventernagamori.s3.ap-northeast-1.amazonaws.com/fixedImage/aws_diagram.png)
+![](https://eventernagamori.s3.ap-northeast-1.amazonaws.com/fixedImage/aws_ECS_diagram.png)
 
 
 # 使用技術
@@ -47,7 +47,7 @@
 * ejs
 
 インフラ
-* AWS(VPC/EC2/RDS/Route53/ELB/ACM/S3)
+* AWS(VPC/EC2/RDS/Route53/ELB/ACM/S3/ECR/ECS)
 
 環境構築
 * Docker/docker-compose
